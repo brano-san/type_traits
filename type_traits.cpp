@@ -1,62 +1,77 @@
 ﻿#include <iostream>
 #include <vector>
 #include <list>
+#include <type_traits>
 #include <set>
 
-using namespace std;
-
-template<typename T>
-class HasBeginEnd
+namespace traits
 {
-private:
-    template<class U>
-    static constexpr auto cheker(U* u) -> decltype((*u).begin(), (*u).end(), bool()) { return true; }
+	template<typename T>
+	class HasBeginEnd
+	{
+	private:
+	    template<class U>
+	    static constexpr auto cheker(U* u) -> decltype((*u).begin(), (*u).end(), bool()) { return true; }
 
-    template<class>
-    static constexpr auto cheker(...) { return false; }
+	    template<class>
+	    static constexpr auto cheker(...) { return false; }
+		
+	public:
+	    static bool constexpr value = cheker<T>(nullptr);
+	};
 
-public:
-    static bool constexpr value = cheker<T>(nullptr);
-};
+	template<typename T>
+	class HasConstBeginEnd
+	{
+	private:
+	    template<class U>
+	    static constexpr auto constCheker(U* u) -> decltype((*u).cbegin(), (*u).cend(), bool()) { return true; }
 
-template<typename T>
-class HasConstBeginEnd
-{
-private:
-    template<class U>
-    static constexpr auto constCheker(U* u) -> decltype((*u).cbegin(), (*u).cend(), bool()) { return true; }
+	    template<class>
+	    static constexpr auto constCheker(...) { return false; }
 
-    template<class>
-    static constexpr auto constCheker(...) { return false; }
+	public:
+	    static bool constexpr value = constCheker<T>(nullptr);
+	};
 
-public:
-    static bool constexpr value = constCheker<T>(nullptr);
-};
+	template<typename T, typename U>
+	struct IsSame
+	{
+	    static bool constexpr value = false;
+	};
 
-template<typename T, typename U>
-class IsSame
-{
-public:
-    static bool constexpr value = false;
-};
+	template<typename T>
+	struct IsSame<T, T>
+	{
+	    static bool constexpr value = true;
+	};
 
-template<typename T>
-class IsSame<T, T>
-{
-public:
-    static bool constexpr value = true;
-};
+	template<typename T>
+	struct IsVoid : IsSame<void, T>
+	{	};
 
-class MyClass
-{
-public:
+	template<typename T>
+	struct RemoveReference
+	{
+		using type = T;
+	};
 
-};
+	template<typename T>
+	struct RemoveReference<T&>
+	{
+		using type = T;
+	};
+
+	template<typename T>
+	struct RemoveReference<T&&>
+	{
+		using type = T;
+	};
+}
 
 int main()
 {
-    std::is_same<int, float>::value_type;
-    cout << HasBeginEnd<vector<int>>::value << endl;
-    cout << HasBeginEnd<list<int>>::value << endl;
-    cout << HasBeginEnd<MyClass>::value << endl;
+	std::cout << traits::IsSame<traits::RemoveReference<int>::type, int>::value << std::endl;
+	std::cout << traits::IsSame<traits::RemoveReference<int&>::type, int>::value << std::endl;
+	std::cout << traits::IsSame<traits::RemoveReference<int&&>::type, int>::value << std::endl;
 }
