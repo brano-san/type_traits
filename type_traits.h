@@ -28,11 +28,20 @@ namespace test_classes
 		void cbegin() {   }
 		void cend() {	}
 	};
+
+	class MyClass
+	{
+	public:
+		MyClass() = default;
+		static void foo(const int& a, const std::string& s) {	}
+	};
+
 }
 
 namespace traits
 {
 	//Has* functions
+	//HasMyFoo (foo(int const&, string))
 	template<typename T>
 	class HasMyFoo
 	{
@@ -89,54 +98,78 @@ namespace traits
 		static bool constexpr value = true;
 	};
 
-	//IsVoid
+	//is void
 	template<typename T>
 	struct IsVoid : IsSame<void, T>
 	{	};
 
+	//is nullptr
+	template<typename T>
+	struct IsNullptr : IsSame<std::nullptr_t, T>
+	{	};
+
 	//Remove* functions
+	//utility function
+	template<typename T>
+	struct Remove
+	{
+		using type = T;
+	};
+
 	//RemoveReference
 	template<typename T>
-	struct RemoveReference
-	{
-		using type = T;
-	};
+	struct RemoveReference : Remove<T>
+	{};
 
 	template<typename T>
-	struct RemoveReference<T&>
-	{
-		using type = T;
-	};
+	struct RemoveReference<T&> : Remove<T>
+	{};
 
 	template<typename T>
-	struct RemoveReference<T&&>
-	{
-		using type = T;
-	};
+	struct RemoveReference<T&&> : Remove<T>
+	{};
 
 	//RemovePointer
 	template<typename T>
-	struct RemovePointer
-	{
-		using type = T;
-	};
+	struct RemovePointer : Remove<T>
+	{};
 
 	template<typename T>
-	struct RemovePointer<T*>
-	{
-		using type = T;
-	};
+	struct RemovePointer<T*> : Remove<T>
+	{};
 
 	//RemoveConst
 	template<typename T>
-	struct RemoveConst
-	{
-		using type = T;
-	};
+	struct RemoveConst : Remove<T>
+	{};
 
 	template<typename T>
-	struct RemoveConst<const T>
-	{
-		using type = T;
-	};
+	struct RemoveConst<const T> : Remove<T>
+	{};
+
+	//RemoveVolatile
+	template<typename T>
+	struct RemoveVolatile : Remove<T>
+	{};
+
+	template<typename T>
+	struct RemoveVolatile<volatile T> : Remove<T>
+	{};
+
+	//RemoveCV
+	template<typename T>
+	struct RemoveCv : Remove<T>
+	{};
+
+	template<typename T>
+	struct RemoveCv<const T> : Remove<T>
+	{};
+
+	template<typename T>
+	struct RemoveCv<volatile T> : Remove<T>
+	{};
+
+	template<typename T>
+	struct RemoveCv<const volatile T> : Remove<T>
+	{};
 }
