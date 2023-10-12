@@ -12,7 +12,6 @@ namespace test_classes
 	class PureClass
 	{
 	public:
-
 	};
 
 	class BeginEnd
