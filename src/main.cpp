@@ -2,7 +2,7 @@
 
 int main()
 {
-	test_classes::CBeginEnd end;
+    test_classes::CBeginEnd end;
 
-	return 0;
+    return 0;
 }
