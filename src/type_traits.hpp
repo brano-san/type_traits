@@ -102,30 +102,6 @@ public:
     static constexpr bool value = constCheker<T>(nullptr);
 };
 
-// Is* functions
-// IsSame
-template <typename T, typename U>
-struct IsSame
-{
-    static constexpr bool value = false;
-};
-
-template <typename T>
-struct IsSame<T, T>
-{
-    static constexpr bool value = true;
-};
-
-// is void
-template <typename T>
-struct IsVoid: IsSame<void, T>
-{};
-
-// is nullptr
-template <typename T>
-struct IsNullptr: IsSame<std::nullptr_t, T>
-{};
-
 // Remove* functions
 // utility function
 template <typename T>
@@ -189,5 +165,29 @@ struct RemoveCv<volatile T>: Remove<T>
 
 template <typename T>
 struct RemoveCv<const volatile T>: Remove<T>
+{};
+
+// Is* functions
+// IsSame
+template <typename T, typename U>
+struct IsSame
+{
+    static constexpr bool value = false;
+};
+
+template <typename T>
+struct IsSame<T, T>
+{
+    static constexpr bool value = true;
+};
+
+// is void
+template <typename T>
+struct IsVoid: IsSame<void, RemoveCv<T>>
+{};
+
+// is nullptr
+template <typename T>
+struct IsNullptr: IsSame<std::nullptr_t, RemoveCv<T>>
 {};
 }  // namespace traits
