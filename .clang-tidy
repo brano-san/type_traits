@@ -1,0 +1,135 @@
+Checks: >
+  clang-analyzer-*,
+  performance-*,
+  portability-*,
+  cert-*,
+
+  hicpp-*,
+  -hicpp-special-member-functions,
+  -hicpp-use-override,
+  -hicpp-no-array-decay,
+  -hicpp-use-auto,
+  -hicpp-named-parameter,
+
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+
+  cppcoreguidelines-*,
+  -cppcoreguidelines-special-member-functions,
+  -cppcoreguidelines-explicit-virtual-functions,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-prefer-member-initializer,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-use-override,
+  -modernize-avoid-bind,
+
+  misc-*,
+  -misc-include-cleaner,
+  
+  llvm-*,
+  -llvm-header-guard,
+  -llvm-include-order,
+
+  -google-*,
+  
+  readability-*,
+  -readability-identifier-length,
+  -readability-redundant-access-specifiers,
+  -readability-avoid-const-params-in-decls,
+  -readability-function-cognitive-complexity
+
+CheckOptions:
+  ### Общие типы ###
+  # Пространства имен (namespace)
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+
+  # Макросы (например, через #define)
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+
+  ### Типы данных ###
+  # Классы
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+
+  # Структуры
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+
+  # Типы (через typedef)
+  - key: readability-identifier-naming.TypedefCase
+    value: camelBack
+
+  # Типы (через using)
+  - key: readability-identifier-naming.TypeAliasCase
+    value: CamelCase
+
+  ### Функции и аргументы ###
+  # Имена функций
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+
+  # Аргументы функций
+  - key: readability-identifier-naming.ParameterCase
+    value: camelBack
+
+  ### Переменные ###
+  # Локальные переменные
+  - key: readability-identifier-naming.LocalVariableCase
+    value: camelBack
+
+  # Глобальные переменные
+  - key: readability-identifier-naming.GlobalVariableCase
+    value: camelBack
+  - key: readability-identifier-naming.GlobalVariablePrefix
+    value: s_
+
+  ### Константы ###
+  # Константы-члены класса
+  - key: readability-identifier-naming.ConstexprFieldCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstexprFieldPrefix
+    value: k
+
+  # Константы класса (обычные, не constexpr)
+  - key: readability-identifier-naming.ConstFieldCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstFieldPrefix
+    value: k
+
+  - key: readability-identifier-naming.ClassConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassConstantPrefix
+    value: k
+
+  - key: readability-identifier-naming.ConstantMemberCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstantMemberPrefix
+    value: k
+
+  # Глобальные константы
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: k
+
+  # Статические константы (например, static const внутри класса)
+  - key: readability-identifier-naming.StaticConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.StaticConstantPrefix
+    value: k
+
+  ### Члены классов ###
+  # Публичные члены
+  - key: readability-identifier-naming.PublicMemberCase
+    value: camelBack
+
+  # Приватные члены
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: camelBack
+  - key: readability-identifier-naming.PrivateMemberPrefix
+    value: m_

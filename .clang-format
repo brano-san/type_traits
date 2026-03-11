@@ -1,0 +1,185 @@
+---
+Language: Cpp
+AccessModifierOffset: -4
+AlignAfterOpenBracket: DontAlign
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: true
+  PadOperators: true
+AlignConsecutiveDeclarations:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  PadOperators: false
+AlignEscapedNewlines: Left
+AlignOperands: Align
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakBeforeMultilineStrings: true
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: true
+BinPackParameters: true
+BitFieldColonSpacing: Both
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  SplitEmptyRecord: false
+  SplitEmptyFunction: false
+  IndentBraces: false
+  BeforeWhile: true
+  BeforeLambdaBody: true
+  BeforeElse: true
+  BeforeCatch: true
+  AfterExternBlock: true
+  AfterUnion: true
+  AfterStruct: true
+  AfterObjCDeclaration: true
+  AfterNamespace: false
+  AfterFunction: true
+  SplitEmptyNamespace: false
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+Cpp11BracedListStyle: true
+ColumnLimit: 130
+CommentPragmas: "^ IWYU pragma:"
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+DeriveLineEnding: false
+DisableFormat: false
+ExperimentalAutoDetectBinPacking: false
+FixNamespaceComments: true
+ForEachMacros:
+  - foreach
+  - Q_FOREACH
+UseTab: Never
+TabWidth: 4
+Standard: c++20
+SpacesInSquareBrackets: false
+SpacesInParentheses: false
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: -1
+SpacesInContainerLiterals: true
+SpacesInConditionalStatement: false
+SpacesInCStyleCastParentheses: false
+SpacesInAngles: Never
+SpacesBeforeTrailingComments: 2
+SpaceInEmptyParentheses: false
+SpaceInEmptyBlock: false
+SpaceBeforeSquareBrackets: false
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeInheritanceColon: false
+SpaceBeforeCtorInitializerColon: false
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCaseColon: false
+SpaceBeforeAssignmentOperators: true
+SpaceAroundPointerQualifiers: Before
+SpaceAfterTemplateKeyword: true
+SpaceAfterLogicalNot: false
+SpaceAfterCStyleCast: false
+ReflowComments: true
+PointerAlignment: Left
+ReferenceAlignment: Left
+PPIndentWidth: 4
+ObjCSpaceBeforeProtocolList: true
+ObjCSpaceAfterProperty: false
+ObjCBlockIndentWidth: 2
+ObjCBinPackProtocolList: Auto
+NamespaceIndentation: None
+MaxEmptyLinesToKeep: 1
+LambdaBodyIndentation: Signature
+KeepEmptyLinesAtTheStartOfBlocks: false
+JavaScriptWrapImports: true
+IndentWrappedFunctionNames: true
+IndentWidth: 4
+IndentPPDirectives: None
+IndentCaseLabels: true
+AlignArrayOfStructures: Right
+AlignConsecutiveBitFields:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCompound: true
+  PadOperators: true
+AlignConsecutiveMacros:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  PadOperators: false
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+AllowAllConstructorInitializersOnNextLine: true
+AlwaysBreakAfterReturnType: None
+BreakAfterAttributes: Leave
+BreakArrays: false
+BreakBeforeBraces: Custom
+BreakBeforeConceptDeclarations: Always
+BreakInheritanceList: AfterComma
+BreakStringLiterals: true
+CompactNamespaces: false
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: LogicalBlock
+IndentAccessModifiers: false
+IndentCaseBlocks: false
+IndentExternBlock: AfterExternBlock
+IndentRequiresClause: false
+InsertNewlineAtEOF: true
+LineEnding: LF
+QualifierAlignment: Custom
+QualifierOrder:
+  - friend
+  - static
+  - volatile
+  - restrict
+  - constexpr
+  - const
+  - type
+RequiresClausePosition: OwnLine
+RequiresExpressionIndentation: OuterScope
+SeparateDefinitionBlocks: Always
+ShortNamespaceLines: 0
+UseCRLF: false
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterForeachMacros: true
+  AfterFunctionDeclarationName: false
+  AfterFunctionDefinitionName: false
+  AfterIfMacros: true
+  AfterOverloadedOperator: false
+  AfterRequiresInClause: false
+  AfterRequiresInExpression: false
+  BeforeNonEmptyParentheses: false
+PackConstructorInitializers: BinPack
+StatementAttributeLikeMacros:
+  - emit
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCaseColons: false
+InsertBraces: true
+IntegerLiteralSeparator:
+  Binary: 4
+  BinaryMinDigits: 4
+  Decimal: 3
+  DecimalMinDigits: 4
+  Hex: -1
+RemoveSemicolon: true
+SortIncludes: false
