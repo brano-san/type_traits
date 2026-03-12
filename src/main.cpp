@@ -2,7 +2,8 @@
 
 int main()
 {
-    test_classes::CBeginEnd end;
+    static_assert(!traits::IsPointerV<int>);
+    static_assert(traits::IsPointerV<int*>);
 
     return 0;
 }

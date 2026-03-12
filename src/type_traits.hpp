@@ -190,4 +190,15 @@ struct IsVoid: IsSame<void, RemoveCv<T>>
 template <typename T>
 struct IsNullptr: IsSame<std::nullptr_t, RemoveCv<T>>
 {};
+
+template <typename T>
+struct IsPointer: std::false_type
+{};
+
+template <typename T>
+struct IsPointer<T*>: std::true_type
+{};
+
+template <typename T>
+inline constexpr bool IsPointerV = IsPointer<T>::value;
 }  // namespace traits
