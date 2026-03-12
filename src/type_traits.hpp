@@ -224,4 +224,15 @@ struct IsReference<T&&>: std::true_type
 
 template <typename T>
 inline constexpr bool IsReferenceV = IsReference<T>::value;
+
+template <typename T>
+struct IsConst: std::false_type
+{};
+
+template <typename T>
+struct IsConst<const T>: std::true_type
+{};
+
+template <typename T>
+inline constexpr bool IsConstV = IsConst<T>::value;
 }  // namespace traits

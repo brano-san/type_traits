@@ -51,5 +51,12 @@ int main()
     static_assert(traits::IsReferenceV<const int&&>);
     static_assert(traits::IsReferenceV<const volatile int&&>);
 
+    static_assert(!traits::IsConstV<int>);
+    static_assert(!traits::IsConstV<volatile int>);
+    static_assert(!traits::IsConstV<const volatile int*>);
+    static_assert(traits::IsConstV<const volatile int>);
+    static_assert(traits::IsConstV<volatile int* const>);
+    static_assert(traits::IsConstV<int* volatile const>);
+
     return 0;
 }
