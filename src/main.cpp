@@ -1,5 +1,8 @@
 ﻿#include "type_traits.hpp"
 
+#include <string>
+#include <vector>
+
 namespace test_classes {
 class PureClass
 {

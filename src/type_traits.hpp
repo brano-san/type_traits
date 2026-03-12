@@ -1,63 +1,60 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <list>
 #include <type_traits>
-#include <set>
-#include <utility>
 
 namespace traits {
 
+namespace details {
 template <typename T>
 struct Remove
 {
     using type = T;
 };
+}  // namespace details
 
 template <typename T>
-struct RemoveReference: Remove<T>
+struct RemoveReference: details::Remove<T>
 {};
 
 template <typename T>
-struct RemoveReference<T&>: Remove<T>
+struct RemoveReference<T&>: details::Remove<T>
 {};
 
 template <typename T>
-struct RemoveReference<T&&>: Remove<T>
+struct RemoveReference<T&&>: details::Remove<T>
 {};
 
 template <typename T>
 using RemoveReferenceT = typename RemoveReference<T>::type;
 
 template <typename T>
-struct RemovePointer: Remove<T>
+struct RemovePointer: details::Remove<T>
 {};
 
 template <typename T>
-struct RemovePointer<T*>: Remove<T>
+struct RemovePointer<T*>: details::Remove<T>
 {};
 
 template <typename T>
 using RemovePointerT = typename RemovePointer<T>::type;
 
 template <typename T>
-struct RemoveConst: Remove<T>
+struct RemoveConst: details::Remove<T>
 {};
 
 template <typename T>
-struct RemoveConst<const T>: Remove<T>
+struct RemoveConst<const T>: details::Remove<T>
 {};
 
 template <typename T>
 using RemoveConstT = typename RemoveConst<T>::type;
 
 template <typename T>
-struct RemoveVolatile: Remove<T>
+struct RemoveVolatile: details::Remove<T>
 {};
 
 template <typename T>
-struct RemoveVolatile<volatile T>: Remove<T>
+struct RemoveVolatile<volatile T>: details::Remove<T>
 {};
 
 template <typename T>
