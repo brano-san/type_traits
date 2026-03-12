@@ -1,5 +1,36 @@
 ﻿#include "type_traits.hpp"
 
+namespace test_classes {
+class PureClass
+{
+public:
+};
+
+class BeginEnd
+{
+public:
+    void begin() {}
+
+    void end() {}
+};
+
+class CBeginEnd
+{
+public:
+    void cbegin() {}
+
+    void cend() {}
+};
+
+class MyClass
+{
+public:
+    MyClass() = default;
+
+    static void foo(const int& a, const std::string& s) {}
+};
+}  // namespace test_classes
+
 int main()
 {
     static_assert(std::is_same_v<traits::RemoveReferenceT<int*>, int*>);
@@ -57,6 +88,12 @@ int main()
     static_assert(traits::IsConstV<const volatile int>);
     static_assert(traits::IsConstV<volatile int* const>);
     static_assert(traits::IsConstV<int* volatile const>);
+
+    ////////////////////////
+
+    static_assert(traits::imagine::has_member_foo<test_classes::MyClass>::value);
+    static_assert(!traits::imagine::has_member_foo<std::vector<int>>::value);
+    static_assert(!traits::imagine::has_member_foo<int>::value);
 
     return 0;
 }
