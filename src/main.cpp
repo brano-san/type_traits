@@ -44,5 +44,12 @@ int main()
     static_assert(!traits::IsPointerV<int>);
     static_assert(traits::IsPointerV<int*>);
 
+    static_assert(!traits::IsReferenceV<int>);
+    static_assert(!traits::IsReferenceV<int*>);
+    static_assert(traits::IsReferenceV<int&>);
+    static_assert(traits::IsReferenceV<int&&>);
+    static_assert(traits::IsReferenceV<const int&&>);
+    static_assert(traits::IsReferenceV<const volatile int&&>);
+
     return 0;
 }

@@ -209,4 +209,19 @@ struct IsPointer<T*>: std::true_type
 
 template <typename T>
 inline constexpr bool IsPointerV = IsPointer<T>::value;
+
+template <typename T>
+struct IsReference: std::false_type
+{};
+
+template <typename T>
+struct IsReference<T&>: std::true_type
+{};
+
+template <typename T>
+struct IsReference<T&&>: std::true_type
+{};
+
+template <typename T>
+inline constexpr bool IsReferenceV = IsReference<T>::value;
 }  // namespace traits
