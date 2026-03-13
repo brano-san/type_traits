@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <type_traits>
 
 namespace traits {
@@ -140,6 +141,17 @@ struct is_const<const T>: std::true_type
 
 template <typename T>
 inline constexpr bool is_const_v = is_const<T>::value;
+
+template <typename T, typename = void>
+struct has_iterator: std::false_type
+{};
+
+template <typename T>
+struct has_iterator<T, std::void_t<typename T::iterator>>: std::true_type
+{};
+
+template <typename T>
+inline constexpr bool has_iterator_v = has_iterator<T>::value;
 
 namespace imagine {
 template <typename T, typename = void>

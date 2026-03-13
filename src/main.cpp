@@ -98,5 +98,24 @@ int main()
     static_assert(!traits::imagine::has_member_foo<std::vector<int>>::value);
     static_assert(!traits::imagine::has_member_foo<int>::value);
 
+    ////////////////////////
+
+    struct MyContainer
+    {
+        using iterator = int*;
+    };
+
+    struct EmptyStruct
+    {};
+
+    // Вектор имеет typedef iterator
+    static_assert(traits::has_iterator_v<std::vector<int>>, "Vector should have iterator");
+
+    // Наш MyContainer имеет
+    static_assert(traits::has_iterator_v<MyContainer>, "MyContainer should have iterator");
+
+    // Обычная структура не имеет
+    static_assert(!traits::has_iterator_v<EmptyStruct>, "EmptyStruct should not have iterator");
+
     return 0;
 }
