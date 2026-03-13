@@ -188,6 +188,18 @@ struct conditional<false, T, U>
 template <bool Cond, typename T, typename U>
 using conditional_t = typename conditional<Cond, T, U>::type;
 
+template <bool Cond, typename T = void>
+struct enable_if;
+
+template <typename T>
+struct enable_if<true, T>
+{
+    using type = T;
+};
+
+template <bool Cond, typename T = void>
+using enable_if_t = typename enable_if<Cond, T>::type;
+
 namespace imagine {
 template <typename T, typename = void>
 struct has_member_foo: std::false_type
