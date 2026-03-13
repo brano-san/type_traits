@@ -207,7 +207,7 @@ struct is_container: std::false_type
 {};
 
 template <typename T>
-struct is_container<T, std::void_t<decltype(std::declval<T>().begin()), decltype(std::declval<T>().end())>>: std::true_type
+struct is_container<T, std::void_t<decltype(std::declval<T&>().begin()), decltype(std::declval<T&>().end())>>: std::true_type
 {};
 
 template <typename T>
