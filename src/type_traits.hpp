@@ -153,6 +153,17 @@ struct has_iterator<T, std::void_t<typename T::iterator>>: std::true_type
 template <typename T>
 inline constexpr bool has_iterator_v = has_iterator<T>::value;
 
+template <typename T, typename = void>
+struct is_container: std::false_type
+{};
+
+template <typename T>
+struct is_container<T, std::void_t<decltype(std::declval<T>().begin()), decltype(std::declval<T>().end())>>: std::true_type
+{};
+
+template <typename T>
+inline constexpr bool is_container_v = is_container<T>::value;
+
 namespace imagine {
 template <typename T, typename = void>
 struct has_member_foo: std::false_type

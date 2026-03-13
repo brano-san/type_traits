@@ -103,19 +103,25 @@ int main()
     struct MyContainer
     {
         using iterator = int*;
+
+        void begin();
     };
 
     struct EmptyStruct
-    {};
+    {
+        void begin();
+        void end();
+    };
 
-    // Вектор имеет typedef iterator
     static_assert(traits::has_iterator_v<std::vector<int>>, "Vector should have iterator");
-
-    // Наш MyContainer имеет
     static_assert(traits::has_iterator_v<MyContainer>, "MyContainer should have iterator");
-
-    // Обычная структура не имеет
     static_assert(!traits::has_iterator_v<EmptyStruct>, "EmptyStruct should not have iterator");
+
+    ////////////////////////
+
+    static_assert(traits::is_container_v<std::vector<int>>, "Vector should have iterator");
+    static_assert(!traits::is_container_v<MyContainer>, "MyContainer should have iterator");
+    static_assert(traits::is_container_v<EmptyStruct>, "EmptyStruct should not have iterator");
 
     return 0;
 }
