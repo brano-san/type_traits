@@ -151,11 +151,15 @@ template <typename T>
 inline constexpr bool is_array_v = is_array<T>::value;
 
 template <typename T>
-struct is_pointer: std::false_type
+struct is_pointer_helper: std::false_type
 {};
 
 template <typename T>
-struct is_pointer<T*>: std::true_type
+struct is_pointer_helper<T*>: std::true_type
+{};
+
+template <typename T>
+struct is_pointer: is_pointer_helper<remove_cv_t<T>>
 {};
 
 template <typename T>

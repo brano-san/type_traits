@@ -85,6 +85,7 @@ int main()
 
     static_assert(!traits::is_pointer_v<int>);
     static_assert(traits::is_pointer_v<int*>);
+    static_assert(traits::is_pointer_v<int* const>);
 
     static_assert(!traits::is_reference_v<int>);
     static_assert(!traits::is_reference_v<int*>);
