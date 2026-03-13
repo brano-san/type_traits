@@ -1,5 +1,6 @@
 ﻿#include "type_traits.hpp"
 
+#include <list>
 #include <string>
 #include <vector>
 
@@ -120,15 +121,20 @@ int main()
         void end();
     };
 
-    static_assert(traits::has_iterator_v<std::vector<int>>, "Vector should have iterator");
-    static_assert(traits::has_iterator_v<MyContainer>, "MyContainer should have iterator");
-    static_assert(!traits::has_iterator_v<EmptyStruct>, "EmptyStruct should not have iterator");
+    static_assert(traits::has_iterator_v<std::vector<int>>);
+    static_assert(traits::has_iterator_v<MyContainer>);
+    static_assert(!traits::has_iterator_v<EmptyStruct>);
 
     ////////////////////////
 
-    static_assert(traits::is_container_v<std::vector<int>>, "Vector should have iterator");
-    static_assert(!traits::is_container_v<MyContainer>, "MyContainer should have iterator");
-    static_assert(traits::is_container_v<EmptyStruct>, "EmptyStruct should not have iterator");
+    static_assert(traits::is_container_v<std::vector<int>>);
+    static_assert(!traits::is_container_v<MyContainer>);
+    static_assert(traits::is_container_v<EmptyStruct>);
+
+    ////////////////////////
+
+    static_assert(std::is_same_v<traits::conditional_t<true, std::vector<int>, std::list<int>>, std::vector<int>>);
+    static_assert(std::is_same_v<traits::conditional_t<false, std::vector<int>, std::list<int>>, std::list<int>>);
 
     return 0;
 }

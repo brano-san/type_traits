@@ -173,6 +173,21 @@ struct is_container<T, std::void_t<decltype(std::declval<T>().begin()), decltype
 template <typename T>
 inline constexpr bool is_container_v = is_container<T>::value;
 
+template <bool Cond, typename T, typename U>
+struct conditional
+{
+    using type = T;
+};
+
+template <typename T, typename U>
+struct conditional<false, T, U>
+{
+    using type = U;
+};
+
+template <bool Cond, typename T, typename U>
+using conditional_t = typename conditional<Cond, T, U>::type;
+
 namespace imagine {
 template <typename T, typename = void>
 struct has_member_foo: std::false_type
