@@ -78,6 +78,15 @@ struct remove_cv
 };
 
 template <typename T>
+struct add_pointer
+{
+    using type = traits::remove_reference_t<T>*;
+};
+
+template <typename T>
+using add_pointer_t = typename add_pointer<T>::type;
+
+template <typename T>
 using remove_cv_t = typename remove_cv<T>::type;
 
 template <typename T, typename U>

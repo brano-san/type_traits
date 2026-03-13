@@ -62,6 +62,13 @@ int main()
     static_assert(std::is_same_v<traits::remove_cv_t<int* volatile const>, int*>);
     static_assert(std::is_same_v<traits::remove_cv_t<const volatile int&>, const volatile int&>);
 
+    static_assert(std::is_same_v<traits::add_pointer_t<int>, int*>);
+    static_assert(std::is_same_v<traits::add_pointer_t<int*>, int**>);
+    static_assert(std::is_same_v<traits::add_pointer_t<int**>, int***>);
+    static_assert(std::is_same_v<traits::add_pointer_t<int&>, int*>);
+    static_assert(std::is_same_v<traits::add_pointer_t<int*&>, int**>);
+    static_assert(std::is_same_v<traits::add_pointer_t<int&&>, int*>);
+
     ////////////////////////
 
     static_assert(traits::is_same_v<int, int>);
