@@ -136,5 +136,10 @@ int main()
     static_assert(std::is_same_v<traits::conditional_t<true, std::vector<int>, std::list<int>>, std::vector<int>>);
     static_assert(std::is_same_v<traits::conditional_t<false, std::vector<int>, std::list<int>>, std::list<int>>);
 
+    static_assert(std::is_same_v<traits::decay_t<const int&>, int>);
+
+    // 2. Массивы (сработает ветка is_array_v)
+    static_assert(std::is_same_v<traits::decay_t<int[5]>, int*>);
+
     return 0;
 }
