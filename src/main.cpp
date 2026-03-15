@@ -141,6 +141,5 @@ int main()
 
     // 2. Массивы (сработает ветка is_array_v)
     static_assert(std::is_same_v<traits::decay_t<int[5]>, int*>);
-
     return 0;
 }

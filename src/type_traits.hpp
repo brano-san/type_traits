@@ -38,6 +38,12 @@
 
 namespace traits {
 
+template <typename T>
+std::add_rvalue_reference_t<T> declval() noexcept
+{
+    static_assert(false, "Cannot call to declval function");
+}
+
 template <typename... Args>
 using void_t = void;
 
@@ -262,7 +268,7 @@ struct is_container: false_type
 {};
 
 template <typename T>
-struct is_container<T, void_t<decltype(std::declval<T&>().begin()), decltype(std::declval<T&>().end())>>: true_type
+struct is_container<T, void_t<decltype(declval<T&>().begin()), decltype(declval<T&>().end())>>: true_type
 {};
 
 template <typename T>
