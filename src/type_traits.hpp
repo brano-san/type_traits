@@ -1,6 +1,5 @@
 #pragma once
 
-#include <utility>
 #include <type_traits>
 
 /* TODO List:
@@ -37,12 +36,6 @@
 */
 
 namespace traits {
-
-template <typename T>
-std::add_rvalue_reference_t<T> declval() noexcept
-{
-    static_assert(false, "Cannot call to declval function");
-}
 
 template <typename... Args>
 using void_t = void;
@@ -116,6 +109,21 @@ struct remove_const<const T>
 
 template <typename T>
 using remove_const_t = typename remove_const<T>::type;
+
+template <typename T>
+struct add_rvalue_reference
+{
+    using type = T&&;
+};
+
+template <typename T>
+using add_rvalue_reference_t = typename add_rvalue_reference<T>::type;
+
+template <typename T>
+add_rvalue_reference_t<T> declval() noexcept
+{
+    static_assert(false, "Cannot call to declval function");
+}
 
 template <typename T>
 struct remove_volatile
