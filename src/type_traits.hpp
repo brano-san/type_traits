@@ -4,6 +4,11 @@
 #include <type_traits>
 
 /* TODO List:
+ - is_signed
+ - is_all_same (by conjunction)
+ - common_type (by ?:)
+ - is_base_of
+
  - is_addible<T, U>
  - is_equality_comparable<T, U>  - T == U
  - is_copy_assignable<T> - T t1, t2; t1 = t2;
