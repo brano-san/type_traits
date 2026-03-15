@@ -5,6 +5,9 @@
 
 namespace traits {
 
+template <typename... Args>
+using void_t = void;
+
 template <typename T>
 struct remove_reference
 {
@@ -196,7 +199,7 @@ struct has_iterator: std::false_type
 {};
 
 template <typename T>
-struct has_iterator<T, std::void_t<typename T::iterator>>: std::true_type
+struct has_iterator<T, void_t<typename T::iterator>>: std::true_type
 {};
 
 template <typename T>
@@ -207,7 +210,7 @@ struct is_container: std::false_type
 {};
 
 template <typename T>
-struct is_container<T, std::void_t<decltype(std::declval<T&>().begin()), decltype(std::declval<T&>().end())>>: std::true_type
+struct is_container<T, void_t<decltype(std::declval<T&>().begin()), decltype(std::declval<T&>().end())>>: std::true_type
 {};
 
 template <typename T>
@@ -259,7 +262,7 @@ struct has_member_foo: std::false_type
 {};
 
 template <typename T>
-struct has_member_foo<T, std::void_t<decltype(T::foo)>>: std::true_type
+struct has_member_foo<T, void_t<decltype(T::foo)>>: std::true_type
 {};
 
 template <typename T>
