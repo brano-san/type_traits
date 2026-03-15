@@ -3,6 +3,34 @@
 #include <utility>
 #include <type_traits>
 
+/* TODO List:
+ - is_addible<T, U>
+ - is_equality_comparable<T, U>  - T == U
+ - is_copy_assignable<T> - T t1, t2; t1 = t2;
+
+ - conjunction - Логическое И
+ - disjunction - Логическое ИЛИ
+ - negation - Логическое Не
+
+ - function_traits:   function_traits<F>::return_type  +  function_traits<F>::argument<0>::type
+   - F(Args...)
+   - F(*)(Args...)
+   - F(T::*)(Args...)
+   - F(T::*)(Args...) const
+
+ - is_invokable: (By args)
+   - is_invocable_v<void(int, double), int, float> - true
+   - is_invocable_v<void(int), std::string>        - false
+
+ - is_detected
+
+ - Анализ типов с переменным количеством шаблонных параметров (допустим std::tuple):
+   - lenght<T> - возвращает количество шаблонных параметров
+   - type_at<N, T> - возвращает N-ый тип из списка шаблонных параметров
+   - contains<U, T> - содержит ли T в списке шаблонных параметров U
+   - push_back<T, U> - добавляет тип в конец списка шаблонных параметров
+*/
+
 namespace traits {
 
 template <typename... Args>
