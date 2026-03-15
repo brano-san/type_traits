@@ -8,6 +8,25 @@ namespace traits {
 template <typename... Args>
 using void_t = void;
 
+template <typename T, T v>
+struct integral_constant
+{
+    static constexpr T value = v;
+
+    constexpr operator T() const noexcept
+    {
+        return value;
+    }
+
+    constexpr T operator()() const noexcept
+    {
+        return value;
+    }
+};
+
+using true_type  = integral_constant<bool, true>;
+using false_type = integral_constant<bool, false>;
+
 template <typename T>
 struct remove_reference
 {
@@ -114,11 +133,11 @@ template <typename T>
 using add_pointer_t = typename add_pointer<T>::type;
 
 template <typename T, typename U>
-struct is_same: std::false_type
+struct is_same: false_type
 {};
 
 template <typename T>
-struct is_same<T, T>: std::true_type
+struct is_same<T, T>: true_type
 {};
 
 template <typename T, typename U>
@@ -139,26 +158,26 @@ template <typename T>
 inline constexpr bool is_nullptr_v = is_nullptr<T>::value;
 
 template <typename T>
-struct is_array: std::false_type
+struct is_array: false_type
 {};
 
 template <typename T>
-struct is_array<T[]>: std::true_type
+struct is_array<T[]>: true_type
 {};
 
 template <typename T, size_t N>
-struct is_array<T[N]>: std::true_type
+struct is_array<T[N]>: true_type
 {};
 
 template <typename T>
 inline constexpr bool is_array_v = is_array<T>::value;
 
 template <typename T>
-struct is_pointer_helper: std::false_type
+struct is_pointer_helper: false_type
 {};
 
 template <typename T>
-struct is_pointer_helper<T*>: std::true_type
+struct is_pointer_helper<T*>: true_type
 {};
 
 template <typename T>
@@ -169,48 +188,48 @@ template <typename T>
 inline constexpr bool is_pointer_v = is_pointer<T>::value;
 
 template <typename T>
-struct is_reference: std::false_type
+struct is_reference: false_type
 {};
 
 template <typename T>
-struct is_reference<T&>: std::true_type
+struct is_reference<T&>: true_type
 {};
 
 template <typename T>
-struct is_reference<T&&>: std::true_type
+struct is_reference<T&&>: true_type
 {};
 
 template <typename T>
 inline constexpr bool is_reference_v = is_reference<T>::value;
 
 template <typename T>
-struct is_const: std::false_type
+struct is_const: false_type
 {};
 
 template <typename T>
-struct is_const<const T>: std::true_type
+struct is_const<const T>: true_type
 {};
 
 template <typename T>
 inline constexpr bool is_const_v = is_const<T>::value;
 
 template <typename T, typename = void>
-struct has_iterator: std::false_type
+struct has_iterator: false_type
 {};
 
 template <typename T>
-struct has_iterator<T, void_t<typename T::iterator>>: std::true_type
+struct has_iterator<T, void_t<typename T::iterator>>: true_type
 {};
 
 template <typename T>
 inline constexpr bool has_iterator_v = has_iterator<T>::value;
 
 template <typename T, typename = void>
-struct is_container: std::false_type
+struct is_container: false_type
 {};
 
 template <typename T>
-struct is_container<T, void_t<decltype(std::declval<T&>().begin()), decltype(std::declval<T&>().end())>>: std::true_type
+struct is_container<T, void_t<decltype(std::declval<T&>().begin()), decltype(std::declval<T&>().end())>>: true_type
 {};
 
 template <typename T>
@@ -258,11 +277,11 @@ using decay_t = typename decay<T>::type;
 
 namespace imagine {
 template <typename T, typename = void>
-struct has_member_foo: std::false_type
+struct has_member_foo: false_type
 {};
 
 template <typename T>
-struct has_member_foo<T, void_t<decltype(T::foo)>>: std::true_type
+struct has_member_foo<T, void_t<decltype(T::foo)>>: true_type
 {};
 
 template <typename T>
