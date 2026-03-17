@@ -349,7 +349,7 @@ using decay_t = typename decay<T>::type;
 template <typename T, typename U>
 struct common_type
 {
-    using type = decltype(declval<bool&>() ? declval<T&>() : declval<U&>());
+    using type = decltype(declval<bool&>() ? declval<T>() : declval<U>());
 };
 
 template <typename T, typename U>
