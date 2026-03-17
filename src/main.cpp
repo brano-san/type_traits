@@ -72,6 +72,8 @@ int main()
 
     ////////////////////////
 
+    std::is_signed_v<int>;
+
     static_assert(traits::is_signed_v<int>);
     static_assert(traits::is_signed_v<char>);
     static_assert(traits::is_signed_v<float>);

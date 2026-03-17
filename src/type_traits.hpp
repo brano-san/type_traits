@@ -220,10 +220,19 @@ template <typename T>
 inline constexpr bool is_array_v = is_array<T>::value;
 
 template <typename T>
-struct is_signed
+struct signed_base
 {
-    static constexpr bool value = (T(-1) < T(1));
+private:
+    using value_type = remove_cv_t<T>;
+
+public:
+    static constexpr bool is_signed   = static_cast<value_type>(-1) < static_cast<value_type>(1);
+    static constexpr bool is_unsigned = !is_signed;
 };
+
+template <typename T>
+struct is_signed: integral_constant<bool, signed_base<T>::is_signed>
+{};
 
 template <typename T>
 inline constexpr bool is_signed_v = is_signed<T>::value;
