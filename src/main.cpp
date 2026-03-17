@@ -211,5 +211,16 @@ int main()
     static_assert(traits::negation_v<traits::bool_constant<true>> == false);
     static_assert(traits::negation_v<traits::bool_constant<false>> == true);
 
+    ///////////////////////
+
+    static_assert(traits::is_addible_v<int>, "int + int should be true");
+    static_assert(traits::is_addible_v<double>, "double + double should be true");
+    static_assert(traits::is_addible_v<int, double>, "int + double should be true");
+    static_assert(traits::is_addible_v<char, int>, "char + int should be true");
+
+    static_assert(!traits::is_addible_v<int*>, "int* + int* should be false (cannot add two pointers)");
+    static_assert(traits::is_addible_v<int*, int>, "int* + int should be true (pointer arithmetic)");
+    static_assert(traits::is_addible_v<int, int*>, "int + int* should be true");
+
     return 0;
 }

@@ -12,7 +12,6 @@
 
  - conjunction - Логическое И
  - disjunction - Логическое ИЛИ
- - negation - Логическое Не
 
  - function_traits:   function_traits<F>::return_type  +  function_traits<F>::argument<0>::type
    - F(Args...)
@@ -363,6 +362,17 @@ struct negation: bool_constant<!bool(T::value)>
 
 template <typename T>
 inline constexpr bool negation_v = negation<T>::value;
+
+template <typename T, typename U, typename = void>
+struct is_addible: false_type
+{};
+
+template <typename T, typename U>
+struct is_addible<T, U, std::void_t<decltype(declval<T&>() + declval<U&>())>>: true_type
+{};
+
+template <typename T, typename U = T>
+inline constexpr bool is_addible_v = is_addible<T, U>::value;
 
 namespace imagine {
 template <typename T, typename = void>
