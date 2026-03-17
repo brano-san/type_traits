@@ -238,6 +238,13 @@ template <typename T>
 inline constexpr bool is_signed_v = is_signed<T>::value;
 
 template <typename T>
+struct is_unsigned: integral_constant<bool, signed_base<T>::is_unsigned>
+{};
+
+template <typename T>
+inline constexpr bool is_unsigned_v = is_unsigned<T>::value;
+
+template <typename T>
 struct is_pointer_helper: false_type
 {};
 
