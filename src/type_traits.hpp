@@ -6,7 +6,6 @@
  - is_all_same (by conjunction)
  - is_base_of
 
- - is_addible<T, U>
  - is_equality_comparable<T, U>  - T == U
  - is_copy_assignable<T> - T t1, t2; t1 = t2;
 
@@ -357,7 +356,7 @@ template <typename T, typename U>
 using common_type_t = typename common_type<T, U>::type;
 
 template <typename T>
-struct negation: bool_constant<!bool(T::value)>
+struct negation: bool_constant<!static_cast<bool>(T::value)>
 {};
 
 template <typename T>
@@ -368,11 +367,22 @@ struct is_addible: false_type
 {};
 
 template <typename T, typename U>
-struct is_addible<T, U, std::void_t<decltype(declval<T&>() + declval<U&>())>>: true_type
+struct is_addible<T, U, std::void_t<decltype(declval<T>() + declval<U>())>>: true_type
 {};
 
 template <typename T, typename U = T>
 inline constexpr bool is_addible_v = is_addible<T, U>::value;
+
+template <typename T, typename U, typename = void>
+struct is_equality_comparable: false_type
+{};
+
+template <typename T, typename U>
+struct is_equality_comparable<T, U, std::void_t<decltype(declval<T>() == declval<U>())>>: true_type
+{};
+
+template <typename T, typename U = T>
+inline constexpr bool is_equality_comparable_v = is_equality_comparable<T, U>::value;
 
 namespace imagine {
 template <typename T, typename = void>

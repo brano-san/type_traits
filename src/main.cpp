@@ -222,5 +222,9 @@ int main()
     static_assert(traits::is_addible_v<int*, int>, "int* + int should be true (pointer arithmetic)");
     static_assert(traits::is_addible_v<int, int*>, "int + int* should be true");
 
+    static_assert(traits::is_equality_comparable_v<int>, "int should be comparable");
+    static_assert(traits::is_equality_comparable_v<double>, "double should be comparable");
+    static_assert(traits::is_equality_comparable_v<int, double>, "int and double should be comparable");
+
     return 0;
 }
