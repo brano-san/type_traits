@@ -6,9 +6,6 @@
  - is_all_same (by conjunction)
  - is_base_of
 
- - is_equality_comparable<T, U>  - T == U
- - is_copy_assignable<T> - T t1, t2; t1 = t2;
-
  - conjunction - Логическое И
  - disjunction - Логическое ИЛИ
 
@@ -378,11 +375,22 @@ struct is_equality_comparable: false_type
 {};
 
 template <typename T, typename U>
-struct is_equality_comparable<T, U, std::void_t<decltype(declval<T>() == declval<U>())>>: true_type
+struct is_equality_comparable<T, U, void_t<decltype(declval<T>() == declval<U>())>>: true_type
 {};
 
 template <typename T, typename U = T>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<T, U>::value;
+
+template <typename T, typename U, typename = void>
+struct is_assignable: false_type
+{};
+
+template <typename T, typename U>
+struct is_assignable<T, U, void_t<decltype(declval<T&>() = declval<U&>())>>: true_type
+{};
+
+template <typename T, typename U>
+inline constexpr bool is_assignable_v = is_assignable<T, U>::value;
 
 namespace imagine {
 template <typename T, typename = void>

@@ -226,5 +226,8 @@ int main()
     static_assert(traits::is_equality_comparable_v<double>, "double should be comparable");
     static_assert(traits::is_equality_comparable_v<int, double>, "int and double should be comparable");
 
+    static_assert(traits::is_assignable_v<int&, int>, "int can be assigned from int");
+    static_assert(!traits::is_assignable_v<int&, void*>, "int cannot be assigned from void*");
+
     return 0;
 }
