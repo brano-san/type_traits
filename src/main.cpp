@@ -208,5 +208,8 @@ int main()
     static_assert(traits::is_same_v<traits::common_type_t<int[2], int[3]>, int*>);
     static_assert(traits::is_same_v<traits::common_type_t<const int[2], int[3]>, const int*>);
 
+    static_assert(traits::negation_v<traits::bool_constant<true>> == false);
+    static_assert(traits::negation_v<traits::bool_constant<false>> == true);
+
     return 0;
 }

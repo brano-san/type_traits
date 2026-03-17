@@ -4,7 +4,6 @@
 
 /* TODO List:
  - is_all_same (by conjunction)
- - common_type (by ?:)
  - is_base_of
 
  - is_addible<T, U>
@@ -55,8 +54,11 @@ struct integral_constant
     }
 };
 
-using true_type  = integral_constant<bool, true>;
-using false_type = integral_constant<bool, false>;
+template <bool V>
+using bool_constant = integral_constant<bool, V>;
+
+using true_type  = bool_constant<true>;
+using false_type = bool_constant<false>;
 
 template <typename T>
 struct remove_reference
@@ -354,6 +356,13 @@ struct common_type
 
 template <typename T, typename U>
 using common_type_t = typename common_type<T, U>::type;
+
+template <typename T>
+struct negation: bool_constant<!bool(T::value)>
+{};
+
+template <typename T>
+inline constexpr bool negation_v = negation<T>::value;
 
 namespace imagine {
 template <typename T, typename = void>
