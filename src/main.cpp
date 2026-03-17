@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <type_traits>
+
 namespace test_classes {
 class PureClass
 {
@@ -35,40 +37,64 @@ public:
 };
 }  // namespace test_classes
 
+namespace {
+struct Base
+{};
+
+struct Derived: Base
+{};
+
+struct ConvertibleToInt
+{
+    operator int() const
+    {
+        return 0;
+    }
+};
+
+struct ConvertibleToDouble
+{
+    operator double() const
+    {
+        return 0.0;
+    }
+};
+}  // namespace
+
 int main()
 {
-    static_assert(std::is_same_v<traits::remove_reference_t<int*>, int*>);
-    static_assert(std::is_same_v<traits::remove_reference_t<int>, int>);
-    static_assert(std::is_same_v<traits::remove_reference_t<int&>, int>);
-    static_assert(std::is_same_v<traits::remove_reference_t<int&&>, int>);
+    static_assert(traits::is_same_v<traits::remove_reference_t<int*>, int*>);
+    static_assert(traits::is_same_v<traits::remove_reference_t<int>, int>);
+    static_assert(traits::is_same_v<traits::remove_reference_t<int&>, int>);
+    static_assert(traits::is_same_v<traits::remove_reference_t<int&&>, int>);
 
-    static_assert(std::is_same_v<traits::remove_pointer_t<int*>, int>);
-    static_assert(std::is_same_v<traits::remove_pointer_t<const int*>, const int>);
-    static_assert(std::is_same_v<traits::remove_pointer_t<volatile int*>, volatile int>);
-    static_assert(std::is_same_v<traits::remove_pointer_t<const volatile int*>, const volatile int>);
-    static_assert(std::is_same_v<traits::remove_pointer_t<const volatile int&>, const volatile int&>);
+    static_assert(traits::is_same_v<traits::remove_pointer_t<int*>, int>);
+    static_assert(traits::is_same_v<traits::remove_pointer_t<const int*>, const int>);
+    static_assert(traits::is_same_v<traits::remove_pointer_t<volatile int*>, volatile int>);
+    static_assert(traits::is_same_v<traits::remove_pointer_t<const volatile int*>, const volatile int>);
+    static_assert(traits::is_same_v<traits::remove_pointer_t<const volatile int&>, const volatile int&>);
 
-    static_assert(std::is_same_v<traits::remove_const_t<int>, int>);
-    static_assert(std::is_same_v<traits::remove_const_t<const int>, int>);
-    static_assert(std::is_same_v<traits::remove_const_t<const volatile int>, volatile int>);
-    static_assert(std::is_same_v<traits::remove_const_t<const volatile int*>, const volatile int*>);
-    static_assert(std::is_same_v<traits::remove_const_t<volatile int* const>, volatile int*>);
-    static_assert(std::is_same_v<traits::remove_const_t<const volatile int&>, const volatile int&>);
+    static_assert(traits::is_same_v<traits::remove_const_t<int>, int>);
+    static_assert(traits::is_same_v<traits::remove_const_t<const int>, int>);
+    static_assert(traits::is_same_v<traits::remove_const_t<const volatile int>, volatile int>);
+    static_assert(traits::is_same_v<traits::remove_const_t<const volatile int*>, const volatile int*>);
+    static_assert(traits::is_same_v<traits::remove_const_t<volatile int* const>, volatile int*>);
+    static_assert(traits::is_same_v<traits::remove_const_t<const volatile int&>, const volatile int&>);
 
-    static_assert(std::is_same_v<traits::remove_cv_t<int>, int>);
-    static_assert(std::is_same_v<traits::remove_cv_t<const int>, int>);
-    static_assert(std::is_same_v<traits::remove_cv_t<const volatile int>, int>);
-    static_assert(std::is_same_v<traits::remove_cv_t<const volatile int*>, const volatile int*>);
-    static_assert(std::is_same_v<traits::remove_cv_t<volatile int* const>, volatile int*>);
-    static_assert(std::is_same_v<traits::remove_cv_t<int* volatile const>, int*>);
-    static_assert(std::is_same_v<traits::remove_cv_t<const volatile int&>, const volatile int&>);
+    static_assert(traits::is_same_v<traits::remove_cv_t<int>, int>);
+    static_assert(traits::is_same_v<traits::remove_cv_t<const int>, int>);
+    static_assert(traits::is_same_v<traits::remove_cv_t<const volatile int>, int>);
+    static_assert(traits::is_same_v<traits::remove_cv_t<const volatile int*>, const volatile int*>);
+    static_assert(traits::is_same_v<traits::remove_cv_t<volatile int* const>, volatile int*>);
+    static_assert(traits::is_same_v<traits::remove_cv_t<int* volatile const>, int*>);
+    static_assert(traits::is_same_v<traits::remove_cv_t<const volatile int&>, const volatile int&>);
 
-    static_assert(std::is_same_v<traits::add_pointer_t<int>, int*>);
-    static_assert(std::is_same_v<traits::add_pointer_t<int*>, int**>);
-    static_assert(std::is_same_v<traits::add_pointer_t<int**>, int***>);
-    static_assert(std::is_same_v<traits::add_pointer_t<int&>, int*>);
-    static_assert(std::is_same_v<traits::add_pointer_t<int*&>, int**>);
-    static_assert(std::is_same_v<traits::add_pointer_t<int&&>, int*>);
+    static_assert(traits::is_same_v<traits::add_pointer_t<int>, int*>);
+    static_assert(traits::is_same_v<traits::add_pointer_t<int*>, int**>);
+    static_assert(traits::is_same_v<traits::add_pointer_t<int**>, int***>);
+    static_assert(traits::is_same_v<traits::add_pointer_t<int&>, int*>);
+    static_assert(traits::is_same_v<traits::add_pointer_t<int*&>, int**>);
+    static_assert(traits::is_same_v<traits::add_pointer_t<int&&>, int*>);
 
     ////////////////////////
 
@@ -156,12 +182,31 @@ int main()
 
     ////////////////////////
 
-    static_assert(std::is_same_v<traits::conditional_t<true, std::vector<int>, std::list<int>>, std::vector<int>>);
-    static_assert(std::is_same_v<traits::conditional_t<false, std::vector<int>, std::list<int>>, std::list<int>>);
+    static_assert(traits::is_same_v<traits::conditional_t<true, std::vector<int>, std::list<int>>, std::vector<int>>);
+    static_assert(traits::is_same_v<traits::conditional_t<false, std::vector<int>, std::list<int>>, std::list<int>>);
 
-    static_assert(std::is_same_v<traits::decay_t<const int&>, int>);
+    static_assert(traits::is_same_v<traits::decay_t<const int&>, int>);
 
     // 2. Массивы (сработает ветка is_array_v)
-    static_assert(std::is_same_v<traits::decay_t<int[5]>, int*>);
+    static_assert(traits::is_same_v<traits::decay_t<int[5]>, int*>);
+
+    ////////////////////////
+
+    static_assert(traits::is_same_v<traits::common_type_t<int, double>, double>);
+
+    static_assert(traits::is_same_v<traits::common_type_t<Base*, Derived*>, Base*>);
+    static_assert(traits::is_same_v<traits::common_type_t<Derived*, Base*>, Base*>);
+    static_assert(traits::is_same_v<std::common_type_t<Derived*, Derived*>, Derived*>);
+    static_assert(traits::is_same_v<traits::common_type_t<void*, int*>, void*>);
+    static_assert(traits::is_same_v<traits::common_type_t<decltype(nullptr), int*>, int*>);
+    static_assert(traits::is_same_v<traits::common_type_t<Base*, decltype(nullptr)>, Base*>);
+
+    static_assert(traits::is_same_v<traits::common_type_t<ConvertibleToInt, int>, int>);
+    static_assert(traits::is_same_v<traits::common_type_t<int, ConvertibleToInt>, int>);
+    static_assert(traits::is_same_v<traits::common_type_t<ConvertibleToInt, double>, double>);
+
+    static_assert(traits::is_same_v<traits::common_type_t<int[2], int[3]>, int*>);
+    static_assert(traits::is_same_v<traits::common_type_t<const int[2], int[3]>, const int*>);
+
     return 0;
 }

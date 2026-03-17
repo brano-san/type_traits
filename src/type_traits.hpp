@@ -3,7 +3,6 @@
 #include <type_traits>
 
 /* TODO List:
- - is_signed
  - is_all_same (by conjunction)
  - common_type (by ?:)
  - is_base_of
@@ -346,6 +345,15 @@ public:
 
 template <typename T>
 using decay_t = typename decay<T>::type;
+
+template <typename T, typename U>
+struct common_type
+{
+    using type = decltype(declval<bool&>() ? declval<T&>() : declval<U&>());
+};
+
+template <typename T, typename U>
+using common_type_t = typename common_type<T, U>::type;
 
 namespace imagine {
 template <typename T, typename = void>
