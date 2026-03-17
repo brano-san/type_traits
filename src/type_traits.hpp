@@ -220,6 +220,15 @@ template <typename T>
 inline constexpr bool is_array_v = is_array<T>::value;
 
 template <typename T>
+struct is_signed
+{
+    static constexpr bool value = (T(-1) < T(1));
+};
+
+template <typename T>
+inline constexpr bool is_signed_v = is_signed<T>::value;
+
+template <typename T>
 struct is_pointer_helper: false_type
 {};
 

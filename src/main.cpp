@@ -72,6 +72,17 @@ int main()
 
     ////////////////////////
 
+    static_assert(traits::is_signed_v<int>);
+    static_assert(traits::is_signed_v<char>);
+    static_assert(traits::is_signed_v<float>);
+    static_assert(traits::is_signed_v<double>);
+    static_assert(!traits::is_signed_v<uint32_t>);
+    static_assert(!traits::is_signed_v<unsigned char>);
+    static_assert(!traits::is_signed_v<unsigned short>);
+    static_assert(!traits::is_signed_v<unsigned int>);
+    static_assert(!traits::is_signed_v<unsigned long>);
+    static_assert(!traits::is_signed_v<unsigned long long>);
+
     static_assert(traits::is_same_v<int, int>);
     static_assert(!traits::is_same_v<int, double>);
     static_assert(!traits::is_same_v<float, double>);
