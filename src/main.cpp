@@ -229,5 +229,8 @@ int main()
     static_assert(traits::is_assignable_v<int&, int>, "int can be assigned from int");
     static_assert(!traits::is_assignable_v<int&, void*>, "int cannot be assigned from void*");
 
+    static_assert(traits::is_copy_assignable_v<int>, "int must be copy assignable");
+    static_assert(traits::is_copy_assignable_v<double>, "double must be copy assignable");
+
     return 0;
 }

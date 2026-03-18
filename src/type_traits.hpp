@@ -392,6 +392,17 @@ struct is_assignable<T, U, void_t<decltype(declval<T&>() = declval<U&>())>>: tru
 template <typename T, typename U>
 inline constexpr bool is_assignable_v = is_assignable<T, U>::value;
 
+template <typename T, typename = void>
+struct is_copy_assignable: false_type
+{};
+
+template <typename T>
+struct is_copy_assignable<T, void_t<decltype(declval<T&>() = declval<const T&>())>>: true_type
+{};
+
+template <typename T>
+inline constexpr bool is_copy_assignable_v = is_copy_assignable<T>::value;
+
 namespace imagine {
 template <typename T, typename = void>
 struct has_member_foo: false_type
