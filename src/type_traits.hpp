@@ -6,7 +6,6 @@
  - is_all_same (by conjunction)
  - is_base_of
 
- - conjunction - Логическое И
  - disjunction - Логическое ИЛИ
 
  - function_traits:   function_traits<F>::return_type  +  function_traits<F>::argument<0>::type
