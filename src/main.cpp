@@ -59,6 +59,25 @@ struct ConvertibleToDouble
         return 0.0;
     }
 };
+
+struct True
+{
+    static constexpr bool value = true;
+};
+
+struct False
+{
+    static constexpr bool value = false;
+};
+
+// ТИП-ЛОВУШКА: если к нему обратиться, компилятор должен упасть.
+// Если conjuction ленивый, он никогда не дойдет до этого типа.
+template <typename T>
+struct ExplodingType
+{
+    static constexpr bool value = false;
+    static_assert(false, "CONJUNCTION НЕ ЛЕНИВЫЙ!");
+};
 }  // namespace
 
 int main()
@@ -231,6 +250,17 @@ int main()
 
     static_assert(traits::is_copy_assignable_v<int>, "int must be copy assignable");
     static_assert(traits::is_copy_assignable_v<double>, "double must be copy assignable");
+
+    ///////////////////////
+
+    static_assert(traits::conjunction<>::value == true, "Empty conjunction should be true");
+    static_assert(traits::conjunction<True>::value == true, "True should be true");
+    static_assert(traits::conjunction<False>::value == false, "False should be false");
+    static_assert(traits::conjunction<True, True, True>::value == true, "True && True && True == true");
+    static_assert(traits::conjunction<True, True, False>::value == false, "True && True && False == false");
+    static_assert(traits::conjunction<False, True, True>::value == false, "False && True && True == false");
+    static_assert(traits::conjunction<False, ExplodingType<int>>::value == false, "Short-circuiting failed!");
+    static_assert(traits::conjunction<std::true_type, std::is_integral<int>>::value == true, "Std types test");
 
     return 0;
 }
