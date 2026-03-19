@@ -253,14 +253,14 @@ int main()
 
     ///////////////////////
 
-    static_assert(traits::conjunction<>::value == true, "Empty conjunction should be true");
-    static_assert(traits::conjunction<True>::value == true, "True should be true");
-    static_assert(traits::conjunction<False>::value == false, "False should be false");
-    static_assert(traits::conjunction<True, True, True>::value == true, "True && True && True == true");
-    static_assert(traits::conjunction<True, True, False>::value == false, "True && True && False == false");
-    static_assert(traits::conjunction<False, True, True>::value == false, "False && True && True == false");
-    static_assert(traits::conjunction<False, ExplodingType<int>>::value == false, "Short-circuiting failed!");
-    static_assert(traits::conjunction<std::true_type, std::is_integral<int>>::value == true, "Std types test");
+    static_assert(traits::conjunction_v<> == true, "Empty conjunction should be true");
+    static_assert(traits::conjunction_v<True> == true, "True should be true");
+    static_assert(traits::conjunction_v<False> == false, "False should be false");
+    static_assert(traits::conjunction_v<True, True, True> == true, "True && True && True == true");
+    static_assert(traits::conjunction_v<True, True, False> == false, "True && True && False == false");
+    static_assert(traits::conjunction_v<False, True, True> == false, "False && True && True == false");
+    static_assert(traits::conjunction_v<False, ExplodingType<int>> == false, "Short-circuiting failed!");
+    static_assert(traits::conjunction_v<std::true_type, std::is_integral<int>> == true, "Std types test");
 
     return 0;
 }
