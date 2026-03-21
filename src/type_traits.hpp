@@ -425,6 +425,21 @@ struct conjunction<Head, Tail...>: conjunction_helper<static_cast<bool>(Head::va
 template <typename... Args>
 inline constexpr bool conjunction_v = conjunction<Args...>::value;
 
+template <typename... Args>
+struct disjunction: false_type
+{};
+
+template <typename T>
+struct disjunction<T>: T
+{};
+
+template <typename Head, typename... Tail>
+struct disjunction<Head, Tail...>: conditional_t<static_cast<bool>(Head::value), Head, disjunction<Tail...>>
+{};
+
+template <typename... Args>
+inline constexpr bool disjunction_v = disjunction<Args...>::value;
+
 namespace imagine {
 template <typename T, typename = void>
 struct has_member_foo: false_type

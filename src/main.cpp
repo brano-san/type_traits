@@ -262,5 +262,20 @@ int main()
     static_assert(traits::conjunction_v<False, ExplodingType<int>> == false, "Short-circuiting failed!");
     static_assert(traits::conjunction_v<std::true_type, std::is_integral<int>> == true, "Std types test");
 
+    // 1. Тест на пустой список аргументов (по стандарту должен быть false)
+    static_assert(traits::disjunction_v<> == false, "Empty disjunction should be false");
+
+    // 2. Тест на одиночные значения
+    static_assert(traits::disjunction_v<std::true_type> == true, "Single true_type should be true");
+    static_assert(traits::disjunction_v<std::false_type> == false, "Single false_type should be false");
+
+    // 3. Тест на несколько ложных значений
+    static_assert(traits::disjunction_v<std::false_type, std::false_type, std::false_type> == false, "All false should be false");
+
+    // 4. Тесты на логику OR (истина в разных позициях)
+    static_assert(traits::disjunction_v<std::true_type, std::false_type, std::false_type> == true, "First true");
+    static_assert(traits::disjunction_v<std::false_type, std::true_type, std::false_type> == true, "Middle true");
+    static_assert(traits::disjunction_v<std::false_type, std::false_type, std::true_type> == true, "Last true");
+
     return 0;
 }
