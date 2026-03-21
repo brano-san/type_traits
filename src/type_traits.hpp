@@ -402,24 +402,16 @@ struct is_copy_assignable<T, void_t<decltype(declval<T&>() = declval<const T&>()
 template <typename T>
 inline constexpr bool is_copy_assignable_v = is_copy_assignable<T>::value;
 
-template <bool Value, typename... Args>
-struct conjunction_helper
-{
-    using type = std::bool_constant<Value>;
-};
-
-template <typename Head, typename... Tail>
-struct conjunction_helper<true, Head, Tail...>
-{
-    using type = typename conjunction_helper<static_cast<bool>(Head::value), Tail...>::type;
-};
-
 template <typename... Args>
-struct conjunction: true_type
+struct conjunction: std::true_type
+{};
+
+template <typename T>
+struct conjunction<T>: T
 {};
 
 template <typename Head, typename... Tail>
-struct conjunction<Head, Tail...>: conjunction_helper<static_cast<bool>(Head::value), Head, Tail...>::type
+struct conjunction<Head, Tail...>: std::conditional_t<static_cast<bool>(Head::value), conjunction<Tail...>, Head>
 {};
 
 template <typename... Args>
