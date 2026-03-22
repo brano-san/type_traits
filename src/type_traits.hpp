@@ -3,10 +3,7 @@
 #include <type_traits>
 
 /* TODO List:
- - is_all_same (by conjunction)
  - is_base_of
-
- - disjunction - Логическое ИЛИ
 
  - function_traits:   function_traits<F>::return_type  +  function_traits<F>::argument<0>::type
    - F(Args...)
@@ -431,6 +428,17 @@ struct disjunction<Head, Tail...>: conditional_t<static_cast<bool>(Head::value),
 
 template <typename... Args>
 inline constexpr bool disjunction_v = disjunction<Args...>::value;
+
+template <typename... Tail>
+struct is_all_same: std::true_type
+{};
+
+template <typename First, typename... Tail>
+struct is_all_same<First, Tail...>: bool_constant<(is_same_v<First, Tail> && ...)>
+{};
+
+template <typename... Args>
+inline constexpr bool is_all_same_v = is_all_same<Args...>::value;
 
 namespace imagine {
 template <typename T, typename = void>

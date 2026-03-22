@@ -277,5 +277,29 @@ int main()
     static_assert(traits::disjunction_v<std::false_type, std::true_type, std::false_type> == true, "Middle true");
     static_assert(traits::disjunction_v<std::false_type, std::false_type, std::true_type> == true, "Last true");
 
+    static_assert(traits::is_all_same_v<> == true, "Empty pack should be true");
+
+    // 2. Один тип
+    static_assert(traits::is_all_same_v<int> == true, "Single type should be true");
+
+    // 3. Несколько одинаковых типов
+    static_assert(traits::is_all_same_v<int, int, int, int> == true, "Multiple same types should be true");
+    static_assert(traits::is_all_same_v<void, void> == true, "Multiple void should be true");
+
+    // 4. Разные типы (очевидные)
+    static_assert(traits::is_all_same_v<int, double> == false, "Int and double are different");
+    static_assert(traits::is_all_same_v<int, int, float> == false, "Last type is different");
+    static_assert(traits::is_all_same_v<char, int, int> == false, "First type is different");
+
+    // 5. Проверка на строгость (const, volatile, ссылки)
+    // is_same считает их РАЗНЫМИ типами
+    static_assert(traits::is_all_same_v<int, const int> == false, "int vs const int are different");
+    static_assert(traits::is_all_same_v<int, int&> == false, "int vs int& are different");
+    static_assert(traits::is_all_same_v<int*, const int*> == false, "int* vs const int* are different");
+
+    // 6. Сложные типы (указатели и массивы)
+    static_assert(traits::is_all_same_v<void*, void*, void*> == true, "Same pointers are same");
+    static_assert(traits::is_all_same_v<int[], int[]> == true, "Same arrays are same");
+
     return 0;
 }
