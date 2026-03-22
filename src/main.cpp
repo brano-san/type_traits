@@ -203,10 +203,7 @@ int main()
 
     static_assert(traits::is_same_v<traits::conditional_t<true, std::vector<int>, std::list<int>>, std::vector<int>>);
     static_assert(traits::is_same_v<traits::conditional_t<false, std::vector<int>, std::list<int>>, std::list<int>>);
-
     static_assert(traits::is_same_v<traits::decay_t<const int&>, int>);
-
-    // 2. Массивы (сработает ветка is_array_v)
     static_assert(traits::is_same_v<traits::decay_t<int[5]>, int*>);
 
     ////////////////////////
@@ -262,44 +259,40 @@ int main()
     static_assert(traits::conjunction_v<False, ExplodingType<int>> == false, "Short-circuiting failed!");
     static_assert(traits::conjunction_v<std::true_type, std::is_integral<int>> == true, "Std types test");
 
-    // 1. Тест на пустой список аргументов (по стандарту должен быть false)
     static_assert(traits::disjunction_v<> == false, "Empty disjunction should be false");
-
-    // 2. Тест на одиночные значения
     static_assert(traits::disjunction_v<std::true_type> == true, "Single true_type should be true");
     static_assert(traits::disjunction_v<std::false_type> == false, "Single false_type should be false");
-
-    // 3. Тест на несколько ложных значений
     static_assert(traits::disjunction_v<std::false_type, std::false_type, std::false_type> == false, "All false should be false");
-
-    // 4. Тесты на логику OR (истина в разных позициях)
     static_assert(traits::disjunction_v<std::true_type, std::false_type, std::false_type> == true, "First true");
     static_assert(traits::disjunction_v<std::false_type, std::true_type, std::false_type> == true, "Middle true");
     static_assert(traits::disjunction_v<std::false_type, std::false_type, std::true_type> == true, "Last true");
 
     static_assert(traits::is_all_same_v<> == true, "Empty pack should be true");
-
-    // 2. Один тип
     static_assert(traits::is_all_same_v<int> == true, "Single type should be true");
-
-    // 3. Несколько одинаковых типов
     static_assert(traits::is_all_same_v<int, int, int, int> == true, "Multiple same types should be true");
     static_assert(traits::is_all_same_v<void, void> == true, "Multiple void should be true");
-
-    // 4. Разные типы (очевидные)
     static_assert(traits::is_all_same_v<int, double> == false, "Int and double are different");
     static_assert(traits::is_all_same_v<int, int, float> == false, "Last type is different");
     static_assert(traits::is_all_same_v<char, int, int> == false, "First type is different");
-
-    // 5. Проверка на строгость (const, volatile, ссылки)
-    // is_same считает их РАЗНЫМИ типами
     static_assert(traits::is_all_same_v<int, const int> == false, "int vs const int are different");
     static_assert(traits::is_all_same_v<int, int&> == false, "int vs int& are different");
     static_assert(traits::is_all_same_v<int*, const int*> == false, "int* vs const int* are different");
-
-    // 6. Сложные типы (указатели и массивы)
     static_assert(traits::is_all_same_v<void*, void*, void*> == true, "Same pointers are same");
     static_assert(traits::is_all_same_v<int[], int[]> == true, "Same arrays are same");
+
+    static_assert(traits::is_all_same_decay_v<int, const int, volatile int, const volatile int>, "Should ignore CV-qualifiers");
+    static_assert(traits::is_all_same_decay_v<int, int&, int&&, const int&>, "Should ignore references");
+    static_assert(
+        traits::is_all_same_decay_v<double, const double&, double&&>, "Should match double with its qualified versions");
+    static_assert(
+        traits::is_all_same_decay_v<int*, int[5], int[10], int[]>, "Decay converts arrays to pointers, so they match int*");
+    void func(int);
+    static_assert(traits::is_all_same_decay_v<decltype(func), void (*)(int)>, "Decay converts functions to function pointers");
+    static_assert(!traits::is_all_same_decay_v<int, long>, "int and long are different types");
+    static_assert(!traits::is_all_same_decay_v<float, double>, "float and double are different");
+    static_assert(!traits::is_all_same_decay_v<int*, const int* const*>, "Pointers to different things are different");
+    static_assert(traits::is_all_same_decay_v<>, "Empty pack is true");
+    static_assert(traits::is_all_same_decay_v<void, const void>, "void is also decayeable");
 
     return 0;
 }

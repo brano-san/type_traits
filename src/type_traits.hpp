@@ -440,6 +440,17 @@ struct is_all_same<First, Tail...>: bool_constant<(is_same_v<First, Tail> && ...
 template <typename... Args>
 inline constexpr bool is_all_same_v = is_all_same<Args...>::value;
 
+template <typename... Tail>
+struct is_all_same_decay: std::true_type
+{};
+
+template <typename First, typename... Tail>
+struct is_all_same_decay<First, Tail...>: bool_constant<(is_same_v<decay_t<First>, decay_t<Tail>> && ...)>
+{};
+
+template <typename... Args>
+inline constexpr bool is_all_same_decay_v = is_all_same_decay<Args...>::value;
+
 namespace imagine {
 template <typename T, typename = void>
 struct has_member_foo: false_type
