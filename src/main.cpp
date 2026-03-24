@@ -1,5 +1,6 @@
 ﻿#include "type_traits.hpp"
 
+#include <cstdint>
 #include <list>
 #include <string>
 #include <vector>
