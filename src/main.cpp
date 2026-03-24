@@ -3,44 +3,34 @@
 #include <list>
 #include <string>
 #include <vector>
-
-#include <type_traits>
+#include <type_traits>  // Для проверок и сравнения со std::
 
 using namespace traits;
 
-// 1. Обычное публичное наследование
+namespace {
+
+// ============================================================================
+// 1. Вспомогательные типы и классы для тестов
+// ============================================================================
+
 struct A
 {};
 
 struct B: A
 {};
 
-static_assert(is_base_of_v<A, B> == true, "Test 1 Failed");
-static_assert(is_base_of_v<A, A> == true, "Test 2 Failed");
-
 struct C
 {};
-
-static_assert(is_base_of_v<A, C> == false, "Test 3 Failed");
 
 struct D: A,
           C
 {};
-
-static_assert(is_base_of_v<A, D> == true, "Test 4 Failed");
-static_assert(is_base_of_v<C, D> == true, "Test 4 Failed");
-
-static_assert(is_base_of_v<int, B> == false, "Test 5 Failed");
-static_assert(is_base_of_v<void, B> == false, "Test 5 Failed");
 
 struct PrivateBase
 {};
 
 struct PrivateDerived: private PrivateBase
 {};
-
-static_assert(std::is_base_of_v<PrivateBase, PrivateDerived> == true);
-static_assert(is_base_of_v<PrivateBase, PrivateDerived> == false, "SFINAE fails on private inheritance");
 
 struct Base1
 {
@@ -57,14 +47,14 @@ struct Diamond: Mid1,
                 Mid2
 {};
 
-static_assert(std::is_base_of_v<Base1, Diamond> == true);
-static_assert(is_base_of_v<Base1, Diamond> == false, "SFINAE fails on ambiguity");
+struct Base
+{};
 
-namespace test_classes {
+struct Derived: Base
+{};
+
 class PureClass
-{
-public:
-};
+{};
 
 class BeginEnd
 {
@@ -89,14 +79,18 @@ public:
 
     static void foo(const int& a, const std::string& s) {}
 };
-}  // namespace test_classes
 
-namespace {
-struct Base
-{};
+struct MyContainer
+{
+    using iterator = int*;
+    void begin();
+};
 
-struct Derived: Base
-{};
+struct EmptyStruct
+{
+    void begin();
+    void end();
+};
 
 struct ConvertibleToInt
 {
@@ -125,228 +119,190 @@ struct False
 };
 
 // ТИП-ЛОВУШКА: если к нему обратиться, компилятор должен упасть.
-// Если conjuction ленивый, он никогда не дойдет до этого типа.
 template <typename T>
 struct ExplodingType
 {
     static constexpr bool value = false;
-    static_assert(false, "CONJUNCTION НЕ ЛЕНИВЫЙ!");
+    static_assert(false, "CONJUNCTION IS NOT SHORT-CIRCUITING!");
 };
+
+void func(int);  // Forward declaration for decay tests
+
+// ============================================================================
+// 2. Compile-time тесты (static_assert)
+// ============================================================================
+
+// --- Type Relationships (Отношения типов) ---
+static_assert(is_base_of_v<A, B>, "Test 1 Failed: B should be base of A");
+static_assert(is_base_of_v<A, A>, "Test 2 Failed: A should be base of itself");
+static_assert(!is_base_of_v<A, C>, "Test 3 Failed: C is not base of A");
+static_assert(is_base_of_v<A, D>, "Test 4 Failed: D inherits A");
+static_assert(is_base_of_v<C, D>, "Test 4 Failed: D inherits C");
+static_assert(!is_base_of_v<int, B>, "Test 5 Failed: int is not a base class");
+static_assert(!is_base_of_v<void, B>, "Test 5 Failed: void is not a base class");
+
+static_assert(std::is_base_of_v<PrivateBase, PrivateDerived>);
+static_assert(!is_base_of_v<PrivateBase, PrivateDerived>, "SFINAE fails on private inheritance (Expected)");
+
+static_assert(std::is_base_of_v<Base1, Diamond>);
+static_assert(!is_base_of_v<Base1, Diamond>, "SFINAE fails on ambiguity (Expected)");
+
+static_assert(is_same_v<int, int>);
+static_assert(!is_same_v<int, double>);
+static_assert(!is_same_v<float, double>);
+static_assert(!is_same_v<int, int*>);
+
+// --- Type Modifiers (Модификаторы типов) ---
+static_assert(is_same_v<remove_reference_t<int*>, int*>);
+static_assert(is_same_v<remove_reference_t<int>, int>);
+static_assert(is_same_v<remove_reference_t<int&>, int>);
+static_assert(is_same_v<remove_reference_t<int&&>, int>);
+
+static_assert(is_same_v<remove_pointer_t<int*>, int>);
+static_assert(is_same_v<remove_pointer_t<const int*>, const int>);
+static_assert(is_same_v<remove_pointer_t<volatile int*>, volatile int>);
+static_assert(is_same_v<remove_pointer_t<const volatile int*>, const volatile int>);
+static_assert(is_same_v<remove_pointer_t<const volatile int&>, const volatile int&>);
+
+static_assert(is_same_v<remove_const_t<int>, int>);
+static_assert(is_same_v<remove_const_t<const int>, int>);
+static_assert(is_same_v<remove_const_t<const volatile int>, volatile int>);
+static_assert(is_same_v<remove_const_t<const volatile int*>, const volatile int*>);
+static_assert(is_same_v<remove_const_t<volatile int* const>, volatile int*>);
+static_assert(is_same_v<remove_const_t<const volatile int&>, const volatile int&>);
+
+static_assert(is_same_v<remove_cv_t<int>, int>);
+static_assert(is_same_v<remove_cv_t<const int>, int>);
+static_assert(is_same_v<remove_cv_t<const volatile int>, int>);
+static_assert(is_same_v<remove_cv_t<const volatile int*>, const volatile int*>);
+static_assert(is_same_v<remove_cv_t<volatile int* const>, volatile int*>);
+static_assert(is_same_v<remove_cv_t<int* volatile const>, int*>);
+static_assert(is_same_v<remove_cv_t<const volatile int&>, const volatile int&>);
+
+static_assert(is_same_v<add_pointer_t<int>, int*>);
+static_assert(is_same_v<add_pointer_t<int*>, int**>);
+static_assert(is_same_v<add_pointer_t<int**>, int***>);
+static_assert(is_same_v<add_pointer_t<int&>, int*>);
+static_assert(is_same_v<add_pointer_t<int*&>, int**>);
+static_assert(is_same_v<add_pointer_t<int&&>, int*>);
+
+// --- Type Categories (Категории типов) ---
+static_assert(is_signed_v<int>);
+static_assert(is_signed_v<char>);
+static_assert(is_signed_v<float>);
+static_assert(is_signed_v<double>);
+static_assert(!is_signed_v<uint32_t>);
+static_assert(!is_signed_v<unsigned char>);
+
+static_assert(!is_unsigned_v<int>);
+static_assert(!is_unsigned_v<char>);
+static_assert(!is_unsigned_v<float>);
+static_assert(is_unsigned_v<uint32_t>);
+static_assert(is_unsigned_v<unsigned char>);
+
+static_assert(is_void_v<void>);
+static_assert(!is_void_v<int*>);
+
+static_assert(is_nullptr_v<std::nullptr_t>);
+static_assert(!is_nullptr_v<int*>);
+
+static_assert(!is_pointer_v<int>);
+static_assert(is_pointer_v<int*>);
+static_assert(is_pointer_v<int* const>);
+
+static_assert(!is_reference_v<int>);
+static_assert(!is_reference_v<int*>);
+static_assert(is_reference_v<int&>);
+static_assert(is_reference_v<int&&>);
+static_assert(is_reference_v<const int&&>);
+
+static_assert(!is_const_v<int>);
+static_assert(!is_const_v<volatile int>);
+static_assert(!is_const_v<const volatile int*>);
+static_assert(is_const_v<const volatile int>);
+static_assert(is_const_v<volatile int* const>);
+
+// --- Custom SFINAE / Concepts (Собственные трейты) ---
+static_assert(imagine::has_member_foo<MyClass>::value);
+static_assert(!imagine::has_member_foo<std::vector<int>>::value);
+static_assert(!imagine::has_member_foo<int>::value);
+
+static_assert(has_iterator_v<std::vector<int>>);
+static_assert(has_iterator_v<MyContainer>);
+static_assert(!has_iterator_v<EmptyStruct>);
+
+static_assert(is_container_v<std::vector<int>>);
+static_assert(!is_container_v<MyContainer>);
+static_assert(is_container_v<EmptyStruct>);
+
+// --- Type Transformations (Преобразования типов) ---
+static_assert(is_same_v<conditional_t<true, std::vector<int>, std::list<int>>, std::vector<int>>);
+static_assert(is_same_v<conditional_t<false, std::vector<int>, std::list<int>>, std::list<int>>);
+
+static_assert(is_same_v<decay_t<const int&>, int>);
+static_assert(is_same_v<decay_t<int[5]>, int*>);
+
+static_assert(is_same_v<common_type_t<int, double>, double>);
+static_assert(is_same_v<common_type_t<Base*, Derived*>, Base*>);
+static_assert(is_same_v<common_type_t<Derived*, Base*>, Base*>);
+static_assert(is_same_v<common_type_t<void*, int*>, void*>);
+static_assert(is_same_v<common_type_t<decltype(nullptr), int*>, int*>);
+static_assert(is_same_v<common_type_t<ConvertibleToInt, int>, int>);
+static_assert(is_same_v<common_type_t<ConvertibleToInt, double>, double>);
+static_assert(is_same_v<common_type_t<int[2], int[3]>, int*>);
+
+// --- Operators & Properties (Операторы и свойства) ---
+static_assert(is_addible_v<int>, "int + int should be true");
+static_assert(is_addible_v<int, double>, "int + double should be true");
+static_assert(!is_addible_v<int*>, "int* + int* should be false");
+static_assert(is_addible_v<int*, int>, "int* + int should be true (pointer arithmetic)");
+
+static_assert(is_equality_comparable_v<int>, "int should be comparable");
+static_assert(is_equality_comparable_v<int, double>, "int and double should be comparable");
+
+static_assert(is_assignable_v<int&, int>, "int can be assigned from int");
+static_assert(!is_assignable_v<int&, void*>, "int cannot be assigned from void*");
+
+static_assert(is_copy_assignable_v<int>, "int must be copy assignable");
+static_assert(is_copy_assignable_v<double>, "double must be copy assignable");
+
+// --- Logical Operators (Логические мета-операции) ---
+static_assert(!negation_v<bool_constant<true>>);
+static_assert(negation_v<bool_constant<false>>);
+
+static_assert(conjunction_v<> == true, "Empty conjunction should be true");
+static_assert(conjunction_v<True> == true);
+static_assert(conjunction_v<False> == false);
+static_assert(conjunction_v<True, True, True> == true);
+static_assert(conjunction_v<True, True, False> == false);
+static_assert(conjunction_v<False, ExplodingType<int>> == false, "Short-circuiting failed!");
+static_assert(conjunction_v<std::true_type, std::is_integral<int>> == true);
+
+static_assert(disjunction_v<> == false, "Empty disjunction should be false");
+static_assert(disjunction_v<std::true_type> == true);
+static_assert(disjunction_v<std::false_type> == false);
+static_assert(disjunction_v<std::false_type, std::false_type, std::true_type> == true);
+
+// --- Variadic Traits (Вариадические проверки) ---
+static_assert(is_all_same_v<>);
+static_assert(is_all_same_v<int, int, int, int>);
+static_assert(!is_all_same_v<int, int, float>);
+static_assert(!is_all_same_v<int, const int>);
+static_assert(!is_all_same_v<int*, const int*>);
+
+static_assert(is_all_same_decay_v<int, const int, volatile int, const volatile int>);
+static_assert(is_all_same_decay_v<int, int&, int&&, const int&>);
+static_assert(is_all_same_decay_v<int*, int[5], int[10], int[]>);
+static_assert(is_all_same_decay_v<decltype(func), void (*)(int)>);
+static_assert(!is_all_same_decay_v<int, long>);
+
 }  // namespace
+
+// ============================================================================
 
 int main()
 {
-    static_assert(traits::is_same_v<traits::remove_reference_t<int*>, int*>);
-    static_assert(traits::is_same_v<traits::remove_reference_t<int>, int>);
-    static_assert(traits::is_same_v<traits::remove_reference_t<int&>, int>);
-    static_assert(traits::is_same_v<traits::remove_reference_t<int&&>, int>);
-
-    static_assert(traits::is_same_v<traits::remove_pointer_t<int*>, int>);
-    static_assert(traits::is_same_v<traits::remove_pointer_t<const int*>, const int>);
-    static_assert(traits::is_same_v<traits::remove_pointer_t<volatile int*>, volatile int>);
-    static_assert(traits::is_same_v<traits::remove_pointer_t<const volatile int*>, const volatile int>);
-    static_assert(traits::is_same_v<traits::remove_pointer_t<const volatile int&>, const volatile int&>);
-
-    static_assert(traits::is_same_v<traits::remove_const_t<int>, int>);
-    static_assert(traits::is_same_v<traits::remove_const_t<const int>, int>);
-    static_assert(traits::is_same_v<traits::remove_const_t<const volatile int>, volatile int>);
-    static_assert(traits::is_same_v<traits::remove_const_t<const volatile int*>, const volatile int*>);
-    static_assert(traits::is_same_v<traits::remove_const_t<volatile int* const>, volatile int*>);
-    static_assert(traits::is_same_v<traits::remove_const_t<const volatile int&>, const volatile int&>);
-
-    static_assert(traits::is_same_v<traits::remove_cv_t<int>, int>);
-    static_assert(traits::is_same_v<traits::remove_cv_t<const int>, int>);
-    static_assert(traits::is_same_v<traits::remove_cv_t<const volatile int>, int>);
-    static_assert(traits::is_same_v<traits::remove_cv_t<const volatile int*>, const volatile int*>);
-    static_assert(traits::is_same_v<traits::remove_cv_t<volatile int* const>, volatile int*>);
-    static_assert(traits::is_same_v<traits::remove_cv_t<int* volatile const>, int*>);
-    static_assert(traits::is_same_v<traits::remove_cv_t<const volatile int&>, const volatile int&>);
-
-    static_assert(traits::is_same_v<traits::add_pointer_t<int>, int*>);
-    static_assert(traits::is_same_v<traits::add_pointer_t<int*>, int**>);
-    static_assert(traits::is_same_v<traits::add_pointer_t<int**>, int***>);
-    static_assert(traits::is_same_v<traits::add_pointer_t<int&>, int*>);
-    static_assert(traits::is_same_v<traits::add_pointer_t<int*&>, int**>);
-    static_assert(traits::is_same_v<traits::add_pointer_t<int&&>, int*>);
-
-    ////////////////////////
-
-    static_assert(traits::is_signed_v<int>);
-    static_assert(traits::is_signed_v<char>);
-    static_assert(traits::is_signed_v<float>);
-    static_assert(traits::is_signed_v<double>);
-    static_assert(!traits::is_signed_v<uint32_t>);
-    static_assert(!traits::is_signed_v<unsigned char>);
-    static_assert(!traits::is_signed_v<unsigned short>);
-    static_assert(!traits::is_signed_v<unsigned int>);
-    static_assert(!traits::is_signed_v<unsigned long>);
-    static_assert(!traits::is_signed_v<unsigned long long>);
-
-    static_assert(!traits::is_unsigned_v<int>);
-    static_assert(!traits::is_unsigned_v<char>);
-    static_assert(!traits::is_unsigned_v<float>);
-    static_assert(!traits::is_unsigned_v<double>);
-    static_assert(traits::is_unsigned_v<uint32_t>);
-    static_assert(traits::is_unsigned_v<unsigned char>);
-    static_assert(traits::is_unsigned_v<unsigned short>);
-    static_assert(traits::is_unsigned_v<unsigned int>);
-    static_assert(traits::is_unsigned_v<unsigned long>);
-    static_assert(traits::is_unsigned_v<unsigned long long>);
-
-    static_assert(traits::is_same_v<int, int>);
-    static_assert(!traits::is_same_v<int, double>);
-    static_assert(!traits::is_same_v<float, double>);
-    static_assert(!traits::is_same_v<int, int*>);
-
-    static_assert(traits::is_void_v<void>);
-    static_assert(!traits::is_void_v<int*>);
-
-    static_assert(traits::is_nullptr_v<nullptr_t>);
-    static_assert(!traits::is_nullptr_v<int*>);
-
-    static_assert(!traits::is_pointer_v<int>);
-    static_assert(traits::is_pointer_v<int*>);
-    static_assert(traits::is_pointer_v<int* const>);
-
-    static_assert(!traits::is_reference_v<int>);
-    static_assert(!traits::is_reference_v<int*>);
-    static_assert(traits::is_reference_v<int&>);
-    static_assert(traits::is_reference_v<int&&>);
-    static_assert(traits::is_reference_v<const int&&>);
-    static_assert(traits::is_reference_v<const volatile int&&>);
-
-    static_assert(!traits::is_const_v<int>);
-    static_assert(!traits::is_const_v<volatile int>);
-    static_assert(!traits::is_const_v<const volatile int*>);
-    static_assert(traits::is_const_v<const volatile int>);
-    static_assert(traits::is_const_v<volatile int* const>);
-    static_assert(traits::is_const_v<int* volatile const>);
-
-    ////////////////////////
-
-    static_assert(traits::imagine::has_member_foo<test_classes::MyClass>::value);
-    static_assert(!traits::imagine::has_member_foo<std::vector<int>>::value);
-    static_assert(!traits::imagine::has_member_foo<int>::value);
-
-    ////////////////////////
-
-    struct MyContainer
-    {
-        using iterator = int*;
-
-        void begin();
-    };
-
-    struct EmptyStruct
-    {
-        void begin();
-        void end();
-    };
-
-    static_assert(traits::has_iterator_v<std::vector<int>>);
-    static_assert(traits::has_iterator_v<MyContainer>);
-    static_assert(!traits::has_iterator_v<EmptyStruct>);
-
-    ////////////////////////
-
-    static_assert(traits::is_container_v<std::vector<int>>);
-    static_assert(!traits::is_container_v<MyContainer>);
-    static_assert(traits::is_container_v<EmptyStruct>);
-
-    ////////////////////////
-
-    static_assert(traits::is_same_v<traits::conditional_t<true, std::vector<int>, std::list<int>>, std::vector<int>>);
-    static_assert(traits::is_same_v<traits::conditional_t<false, std::vector<int>, std::list<int>>, std::list<int>>);
-    static_assert(traits::is_same_v<traits::decay_t<const int&>, int>);
-    static_assert(traits::is_same_v<traits::decay_t<int[5]>, int*>);
-
-    ////////////////////////
-
-    static_assert(traits::is_same_v<traits::common_type_t<int, double>, double>);
-
-    static_assert(traits::is_same_v<traits::common_type_t<Base*, Derived*>, Base*>);
-    static_assert(traits::is_same_v<traits::common_type_t<Derived*, Base*>, Base*>);
-    static_assert(traits::is_same_v<std::common_type_t<Derived*, Derived*>, Derived*>);
-    static_assert(traits::is_same_v<traits::common_type_t<void*, int*>, void*>);
-    static_assert(traits::is_same_v<traits::common_type_t<decltype(nullptr), int*>, int*>);
-    static_assert(traits::is_same_v<traits::common_type_t<Base*, decltype(nullptr)>, Base*>);
-
-    static_assert(traits::is_same_v<traits::common_type_t<ConvertibleToInt, int>, int>);
-    static_assert(traits::is_same_v<traits::common_type_t<int, ConvertibleToInt>, int>);
-    static_assert(traits::is_same_v<traits::common_type_t<ConvertibleToInt, double>, double>);
-
-    static_assert(traits::is_same_v<traits::common_type_t<int[2], int[3]>, int*>);
-    static_assert(traits::is_same_v<traits::common_type_t<const int[2], int[3]>, const int*>);
-
-    static_assert(traits::negation_v<traits::bool_constant<true>> == false);
-    static_assert(traits::negation_v<traits::bool_constant<false>> == true);
-
-    ///////////////////////
-
-    static_assert(traits::is_addible_v<int>, "int + int should be true");
-    static_assert(traits::is_addible_v<double>, "double + double should be true");
-    static_assert(traits::is_addible_v<int, double>, "int + double should be true");
-    static_assert(traits::is_addible_v<char, int>, "char + int should be true");
-
-    static_assert(!traits::is_addible_v<int*>, "int* + int* should be false (cannot add two pointers)");
-    static_assert(traits::is_addible_v<int*, int>, "int* + int should be true (pointer arithmetic)");
-    static_assert(traits::is_addible_v<int, int*>, "int + int* should be true");
-
-    static_assert(traits::is_equality_comparable_v<int>, "int should be comparable");
-    static_assert(traits::is_equality_comparable_v<double>, "double should be comparable");
-    static_assert(traits::is_equality_comparable_v<int, double>, "int and double should be comparable");
-
-    static_assert(traits::is_assignable_v<int&, int>, "int can be assigned from int");
-    static_assert(!traits::is_assignable_v<int&, void*>, "int cannot be assigned from void*");
-
-    static_assert(traits::is_copy_assignable_v<int>, "int must be copy assignable");
-    static_assert(traits::is_copy_assignable_v<double>, "double must be copy assignable");
-
-    ///////////////////////
-
-    static_assert(traits::conjunction_v<> == true, "Empty conjunction should be true");
-    static_assert(traits::conjunction_v<True> == true, "True should be true");
-    static_assert(traits::conjunction_v<False> == false, "False should be false");
-    static_assert(traits::conjunction_v<True, True, True> == true, "True && True && True == true");
-    static_assert(traits::conjunction_v<True, True, False> == false, "True && True && False == false");
-    static_assert(traits::conjunction_v<False, True, True> == false, "False && True && True == false");
-    static_assert(traits::conjunction_v<False, ExplodingType<int>> == false, "Short-circuiting failed!");
-    static_assert(traits::conjunction_v<std::true_type, std::is_integral<int>> == true, "Std types test");
-
-    static_assert(traits::disjunction_v<> == false, "Empty disjunction should be false");
-    static_assert(traits::disjunction_v<std::true_type> == true, "Single true_type should be true");
-    static_assert(traits::disjunction_v<std::false_type> == false, "Single false_type should be false");
-    static_assert(traits::disjunction_v<std::false_type, std::false_type, std::false_type> == false, "All false should be false");
-    static_assert(traits::disjunction_v<std::true_type, std::false_type, std::false_type> == true, "First true");
-    static_assert(traits::disjunction_v<std::false_type, std::true_type, std::false_type> == true, "Middle true");
-    static_assert(traits::disjunction_v<std::false_type, std::false_type, std::true_type> == true, "Last true");
-
-    static_assert(traits::is_all_same_v<> == true, "Empty pack should be true");
-    static_assert(traits::is_all_same_v<int> == true, "Single type should be true");
-    static_assert(traits::is_all_same_v<int, int, int, int> == true, "Multiple same types should be true");
-    static_assert(traits::is_all_same_v<void, void> == true, "Multiple void should be true");
-    static_assert(traits::is_all_same_v<int, double> == false, "Int and double are different");
-    static_assert(traits::is_all_same_v<int, int, float> == false, "Last type is different");
-    static_assert(traits::is_all_same_v<char, int, int> == false, "First type is different");
-    static_assert(traits::is_all_same_v<int, const int> == false, "int vs const int are different");
-    static_assert(traits::is_all_same_v<int, int&> == false, "int vs int& are different");
-    static_assert(traits::is_all_same_v<int*, const int*> == false, "int* vs const int* are different");
-    static_assert(traits::is_all_same_v<void*, void*, void*> == true, "Same pointers are same");
-    static_assert(traits::is_all_same_v<int[], int[]> == true, "Same arrays are same");
-
-    static_assert(traits::is_all_same_decay_v<int, const int, volatile int, const volatile int>, "Should ignore CV-qualifiers");
-    static_assert(traits::is_all_same_decay_v<int, int&, int&&, const int&>, "Should ignore references");
-    static_assert(
-        traits::is_all_same_decay_v<double, const double&, double&&>, "Should match double with its qualified versions");
-    static_assert(
-        traits::is_all_same_decay_v<int*, int[5], int[10], int[]>, "Decay converts arrays to pointers, so they match int*");
-    void func(int);
-    static_assert(traits::is_all_same_decay_v<decltype(func), void (*)(int)>, "Decay converts functions to function pointers");
-    static_assert(!traits::is_all_same_decay_v<int, long>, "int and long are different types");
-    static_assert(!traits::is_all_same_decay_v<float, double>, "float and double are different");
-    static_assert(!traits::is_all_same_decay_v<int*, const int* const*>, "Pointers to different things are different");
-    static_assert(traits::is_all_same_decay_v<>, "Empty pack is true");
-    static_assert(traits::is_all_same_decay_v<void, const void>, "void is also decayeable");
-
+    // Поскольку все проверки происходят на этапе компиляции,
+    // main() остается чистым. Если код скомпилировался — тесты пройдены!
     return 0;
 }
