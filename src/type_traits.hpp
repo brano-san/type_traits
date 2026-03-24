@@ -151,7 +151,7 @@ struct remove_extent<T[]>
     using type = T;
 };
 
-template <typename T, size_t N>
+template <typename T, std::size_t N>
 struct remove_extent<T[N]>
 {
     using type = T;
@@ -202,7 +202,7 @@ template <typename T>
 struct is_array<T[]>: true_type
 {};
 
-template <typename T, size_t N>
+template <typename T, std::size_t N>
 struct is_array<T[N]>: true_type
 {};
 
@@ -465,7 +465,7 @@ struct is_base_of: bool_constant<(std::is_class_v<Base> && std::is_class_v<Deriv
 template <typename Base, typename Derived>
 inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
 
-template <size_t N, typename... Args>
+template <std::size_t N, typename... Args>
 struct argument
 {};
 
@@ -475,11 +475,11 @@ struct argument<0, Head, Tail...>
     using type = Head;
 };
 
-template <size_t N, typename Head, typename... Tail>
+template <std::size_t N, typename Head, typename... Tail>
 struct argument<N, Head, Tail...>: argument<N - 1, Tail...>
 {};
 
-template <size_t N, typename... Args>
+template <std::size_t N, typename... Args>
 using argument_t = typename argument<N, Args...>::type;
 
 template <typename R, typename... Args>
@@ -492,7 +492,7 @@ struct function_traits<R(Args...)>
     using return_type                  = R;
     static constexpr std::size_t arity = sizeof...(Args);
 
-    template <size_t N>
+    template <std::size_t N>
     using arg_t = argument_t<N, Args...>;
 };
 

@@ -386,6 +386,7 @@ void test_function_traits()
     static_assert(std::is_same_v<F2::class_type, Processor>, "Class type mismatch");
     static_assert(std::is_same_v<F2::arg_t<0>, int>, "Method Arg 0 mismatch");
     static_assert(std::is_same_v<F2::arg_t<1>, float>, "Method Arg 1 mismatch");
+    static_assert(std::is_same_v<F2::return_type, void>);
 }
 
 int main()
