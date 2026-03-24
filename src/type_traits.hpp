@@ -486,6 +486,8 @@ using argument_t = typename argument<N, Args...>::type;
 template <typename R, typename... Args>
 struct function_traits_info
 {
+    using plain_signature = R(Args...);
+
     using args_tuple = std::tuple<Args...>;
 
     using return_type                  = R;
