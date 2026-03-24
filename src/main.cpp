@@ -6,6 +6,60 @@
 
 #include <type_traits>
 
+using namespace traits;
+
+// 1. Обычное публичное наследование
+struct A
+{};
+
+struct B: A
+{};
+
+static_assert(is_base_of_v<A, B> == true, "Test 1 Failed");
+static_assert(is_base_of_v<A, A> == true, "Test 2 Failed");
+
+struct C
+{};
+
+static_assert(is_base_of_v<A, C> == false, "Test 3 Failed");
+
+struct D: A,
+          C
+{};
+
+static_assert(is_base_of_v<A, D> == true, "Test 4 Failed");
+static_assert(is_base_of_v<C, D> == true, "Test 4 Failed");
+
+static_assert(is_base_of_v<int, B> == false, "Test 5 Failed");
+static_assert(is_base_of_v<void, B> == false, "Test 5 Failed");
+
+struct PrivateBase
+{};
+
+struct PrivateDerived: private PrivateBase
+{};
+
+static_assert(std::is_base_of_v<PrivateBase, PrivateDerived> == true);
+static_assert(is_base_of_v<PrivateBase, PrivateDerived> == false, "SFINAE fails on private inheritance");
+
+struct Base1
+{
+    int x;
+};
+
+struct Mid1: Base1
+{};
+
+struct Mid2: Base1
+{};
+
+struct Diamond: Mid1,
+                Mid2
+{};
+
+static_assert(std::is_base_of_v<Base1, Diamond> == true);
+static_assert(is_base_of_v<Base1, Diamond> == false, "SFINAE fails on ambiguity");
+
 namespace test_classes {
 class PureClass
 {

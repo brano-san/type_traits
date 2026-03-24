@@ -451,6 +451,22 @@ struct is_all_same_decay<First, Tail...>: bool_constant<(is_same_v<decay_t<First
 template <typename... Args>
 inline constexpr bool is_all_same_decay_v = is_all_same_decay<Args...>::value;
 
+template <typename Base, typename Derived, typename = void>
+struct is_base_of_impl: false_type
+{};
+
+template <typename Base, typename Derived>
+struct is_base_of_impl<Base, Derived, void_t<decltype(static_cast<const Base*>(declval<const Derived*>()))>>: true_type
+{};
+
+template <typename Base, typename Derived>
+struct is_base_of: bool_constant<(std::is_class_v<Base> && std::is_class_v<Derived> && is_base_of_impl<Base, Derived>::value) ||
+                                 (std::is_class_v<Base> && is_same_v<Base, Derived>)>
+{};
+
+template <typename Base, typename Derived>
+inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
+
 namespace imagine {
 template <typename T, typename = void>
 struct has_member_foo: false_type
