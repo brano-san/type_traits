@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tuple>
 #include <type_traits>
 
 /* TODO List:
@@ -483,12 +484,10 @@ template <std::size_t N, typename... Args>
 using argument_t = typename argument<N, Args...>::type;
 
 template <typename R, typename... Args>
-struct function_traits
-{};
-
-template <typename R, typename... Args>
-struct function_traits<R(Args...)>
+struct function_traits_info
 {
+    using args_tuple = std::tuple<Args...>;
+
     using return_type                  = R;
     static constexpr std::size_t arity = sizeof...(Args);
 
@@ -497,19 +496,61 @@ struct function_traits<R(Args...)>
 };
 
 template <typename R, typename... Args>
+struct function_traits
+{};
+
+template <typename R, typename... Args>
+struct function_traits<R(Args...)>: function_traits_info<R, Args...>
+{
+    static constexpr bool is_const    = false;
+    static constexpr bool is_noexcept = false;
+};
+
+template <typename R, typename... Args>
+struct function_traits<R(Args...) noexcept>: function_traits_info<R, Args...>
+{
+    static constexpr bool is_const    = false;
+    static constexpr bool is_noexcept = true;
+};
+
+template <typename R, typename... Args>
 struct function_traits<R (*)(Args...)>: function_traits<R(Args...)>
 {};
 
+template <typename R, typename... Args>
+struct function_traits<R (*)(Args...) noexcept>: function_traits<R(Args...) noexcept>
+{};
+
 template <typename R, typename T, typename... Args>
-struct function_traits<R (T::*)(Args...)>: function_traits<R(Args...)>
+struct function_traits<R (T::*)(Args...)>: function_traits_info<R, Args...>
 {
-    using class_type = T;
+    using class_type                  = T;
+    static constexpr bool is_const    = false;
+    static constexpr bool is_noexcept = false;
 };
 
 template <typename R, typename T, typename... Args>
-struct function_traits<R (T::*)(Args...) const>: function_traits<R(Args...)>
+struct function_traits<R (T::*)(Args...) const>: function_traits_info<R, Args...>
 {
-    using class_type = T;
+    using class_type                  = T;
+    static constexpr bool is_const    = true;
+    static constexpr bool is_noexcept = false;
+};
+
+template <typename R, typename T, typename... Args>
+struct function_traits<R (T::*)(Args...) noexcept>: function_traits_info<R, Args...>
+{
+    using class_type                  = T;
+    static constexpr bool is_const    = false;
+    static constexpr bool is_noexcept = true;
+};
+
+template <typename R, typename T, typename... Args>
+struct function_traits<R (T::*)(Args...) const noexcept>: function_traits_info<R, Args...>
+{
+    using class_type                  = T;
+    static constexpr bool is_const    = true;
+    static constexpr bool is_noexcept = true;
 };
 
 namespace imagine {

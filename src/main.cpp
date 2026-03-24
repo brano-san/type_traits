@@ -323,71 +323,116 @@ auto lambda = [](int a) -> double { return a * 1.5; };
 
 }  // namespace
 
-int complex_func(double a, std::string b, char c)
-{
-    return 0;
-}
+namespace {
 
-// Тестовый класс
-struct Processor
+void free_func_noexcept(int, float) noexcept {}
+
+struct FullProcessor
 {
-    void process(int x, float y) const {}
+    // 4 комбинации методов класса
+    void m_plain() {}
+
+    void m_const(int) const {}
+
+    void m_noexcept(int, double) noexcept {}
+
+    void m_const_noexcept(int, double, char) const noexcept {}
 };
+
+auto my_lambda = [](int a) -> double { return a * 1.5; };
+
+}  // namespace
+
+// ============================================================================
+// Сами тесты
+// ============================================================================
 
 void test_function_traits()
 {
-    using namespace traits;
+    // ==========================================
+    // 1. ТЕСТЫ СВОБОДНЫХ ФУНКЦИЙ (СИГНАТУРЫ И УКАЗАТЕЛИ)
+    // ==========================================
 
-    // 1. Тест обычной сигнатуры функции
-    using T1 = function_traits<void(int, float)>;
-    static_assert(is_same_v<typename T1::return_type, void>);
-    static_assert(T1::arity == 2);
+    // 1.1 Сигнатура обычной функции: R(Args...)
+    using F_Sig = function_traits<void(int, float)>;
+    static_assert(is_same_v<F_Sig::return_type, void>);
+    static_assert(F_Sig::arity == 2);
+    static_assert(!F_Sig::is_const);
+    static_assert(!F_Sig::is_noexcept);
+    static_assert(is_same_v<F_Sig::args_tuple, std::tuple<int, float>>);
 
-    // 2. Тест указателя на свободную функцию
-    using T2 = function_traits<decltype(&free_function)>;
-    static_assert(is_same_v<typename T2::return_type, int>);
-    static_assert(T2::arity == 1);
+    // 1.2 Сигнатура noexcept функции: R(Args...) noexcept
+    using F_SigNoexcept = function_traits<void(int, float) noexcept>;
+    static_assert(is_same_v<F_SigNoexcept::return_type, void>);
+    static_assert(!F_SigNoexcept::is_const);
+    static_assert(F_SigNoexcept::is_noexcept);
 
-    // 3. Тест обычного метода класса
-    using T3 = function_traits<decltype(&MyClassFunc::method)>;
-    static_assert(is_same_v<typename T3::return_type, void>);
-    static_assert(is_same_v<typename T3::class_type, MyClassFunc>);
-    static_assert(T3::arity == 1);
+    // 1.3 Указатель на функцию: R(*)(Args...)
+    using funcPtr = function_traits<decltype(&free_function)>;
+    static_assert(is_same_v<funcPtr::return_type, int>);
+    static_assert(funcPtr::arity == 1);
+    static_assert(!funcPtr::is_const);
+    static_assert(!funcPtr::is_noexcept);
+    static_assert(is_same_v<funcPtr::arg_t<0>, const std::string&>);
 
-    // 4. Тест константного метода класса
-    using T4 = function_traits<decltype(&MyClassFunc::const_method)>;
-    static_assert(is_same_v<typename T4::return_type, int>);
-    static_assert(is_same_v<typename T4::class_type, MyClassFunc>);
-    static_assert(T4::arity == 2);
+    // 1.4 Указатель на noexcept функцию: R(*)(Args...) noexcept
+    using F_PtrNoexcept = function_traits<decltype(&free_func_noexcept)>;
+    static_assert(is_same_v<F_PtrNoexcept::return_type, void>);
+    static_assert(!F_PtrNoexcept::is_const);
+    static_assert(F_PtrNoexcept::is_noexcept);
 
-    // 5. Тест лямбды (через ее operator())
-    // Лямбда сама по себе не подходит под шаблоны выше,
-    // но можно проверить её метод вызова:
-    using T5 = function_traits<decltype(&decltype(lambda)::operator())>;
-    static_assert(is_same_v<typename T5::return_type, double>);
-    static_assert(T5::arity == 1);
+    // ==========================================
+    // 2. ТЕСТЫ МЕТОДОВ КЛАССА (ВСЕ 4 КОМБИНАЦИИ)
+    // ==========================================
 
-    // 6. Сложные типы
-    using T6 = function_traits<std::string*(const char**, int)>;
-    static_assert(is_same_v<typename T6::return_type, std::string*>);
-    static_assert(T6::arity == 2);
+    // 2.1 Обычный метод (без const, без noexcept) + arity == 0
+    using M_Plain = function_traits<decltype(&FullProcessor::m_plain)>;
+    static_assert(is_same_v<M_Plain::class_type, FullProcessor>);
+    static_assert(is_same_v<M_Plain::return_type, void>);
+    static_assert(M_Plain::arity == 0);
+    static_assert(!M_Plain::is_const);
+    static_assert(!M_Plain::is_noexcept);
+    static_assert(is_same_v<M_Plain::args_tuple, std::tuple<>>);  // Пустой tuple
 
-    static_assert(is_same_v<argument_t<2, int, double, float, char>, float>);
+    // 2.2 Const метод
+    using M_Const = function_traits<decltype(&FullProcessor::m_const)>;
+    static_assert(is_same_v<M_Const::class_type, FullProcessor>);
+    static_assert(M_Const::arity == 1);
+    static_assert(M_Const::is_const);
+    static_assert(!M_Const::is_noexcept);
+    static_assert(is_same_v<M_Const::arg_t<0>, int>);
 
-    using F1 = function_traits<decltype(complex_func)>;
-    static_assert(std::is_same_v<F1::return_type, int>, "Return type mismatch");
-    static_assert(F1::arity == 3, "Arity mismatch");
+    // 2.3 Noexcept метод
+    using M_Noexcept = function_traits<decltype(&FullProcessor::m_noexcept)>;
+    static_assert(is_same_v<M_Noexcept::class_type, FullProcessor>);
+    static_assert(M_Noexcept::arity == 2);
+    static_assert(!M_Noexcept::is_const);
+    static_assert(M_Noexcept::is_noexcept);
+    static_assert(is_same_v<M_Noexcept::args_tuple, std::tuple<int, double>>);
 
-    static_assert(std::is_same_v<F1::arg_t<0>, double>, "Arg 0 mismatch");
-    static_assert(std::is_same_v<F1::arg_t<1>, std::string>, "Arg 1 mismatch");
-    static_assert(std::is_same_v<F1::arg_t<2>, char>, "Arg 2 mismatch");
+    // 2.4 Const Noexcept метод
+    using M_ConstNoexcept = function_traits<decltype(&FullProcessor::m_const_noexcept)>;
+    static_assert(is_same_v<M_ConstNoexcept::class_type, FullProcessor>);
+    static_assert(M_ConstNoexcept::arity == 3);
+    static_assert(M_ConstNoexcept::is_const);
+    static_assert(M_ConstNoexcept::is_noexcept);
+    static_assert(is_same_v<M_ConstNoexcept::arg_t<2>, char>);
 
-    // Тест для метода класса
-    using F2 = function_traits<decltype(&Processor::process)>;
-    static_assert(std::is_same_v<F2::class_type, Processor>, "Class type mismatch");
-    static_assert(std::is_same_v<F2::arg_t<0>, int>, "Method Arg 0 mismatch");
-    static_assert(std::is_same_v<F2::arg_t<1>, float>, "Method Arg 1 mismatch");
-    static_assert(std::is_same_v<F2::return_type, void>);
+    // ==========================================
+    // 3. ТЕСТЫ ЛЯМБД И СЛОЖНЫХ ТИПОВ
+    // ==========================================
+
+    // 3.1 Лямбда (проверяем operator() - обычно он const по умолчанию)
+    using L_Traits = function_traits<decltype(&decltype(my_lambda)::operator())>;
+    static_assert(is_same_v<L_Traits::return_type, double>);
+    static_assert(L_Traits::arity == 1);
+    static_assert(L_Traits::is_const);  // operator() лямбды (без mutable) является const
+
+    // 3.2 Сложная сигнатура с указателями на указатели
+    using ComplexSig = function_traits<std::string*(const char**, int)>;
+    static_assert(is_same_v<ComplexSig::return_type, std::string*>);
+    static_assert(ComplexSig::arity == 2);
+    static_assert(is_same_v<ComplexSig::arg_t<0>, const char**>);
 }
 
 int main()
