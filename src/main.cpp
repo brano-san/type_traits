@@ -276,12 +276,12 @@ static_assert(conjunction_v<False> == false);
 static_assert(conjunction_v<True, True, True> == true);
 static_assert(conjunction_v<True, True, False> == false);
 static_assert(conjunction_v<False, ExplodingType<int>> == false, "Short-circuiting failed!");
-static_assert(conjunction_v<std::true_type, std::is_integral<int>> == true);
+static_assert(conjunction_v<true_type, std::is_integral<int>> == true);
 
 static_assert(disjunction_v<> == false, "Empty disjunction should be false");
-static_assert(disjunction_v<std::true_type> == true);
-static_assert(disjunction_v<std::false_type> == false);
-static_assert(disjunction_v<std::false_type, std::false_type, std::true_type> == true);
+static_assert(disjunction_v<true_type> == true);
+static_assert(disjunction_v<false_type> == false);
+static_assert(disjunction_v<false_type, false_type, true_type> == true);
 
 // --- Variadic Traits (Вариадические проверки) ---
 static_assert(is_all_same_v<>);
@@ -299,6 +299,67 @@ static_assert(!is_all_same_decay_v<int, long>);
 }  // namespace
 
 // ============================================================================
+
+namespace {
+
+// Тестовые объекты
+struct MyClassFunc
+{
+    void method(int) {}
+
+    int const_method(double, double) const
+    {
+        return 0;
+    }
+};
+
+int free_function(const std::string&)
+{
+    return 42;
+}
+
+auto lambda = [](int a) -> double { return a * 1.5; };
+
+}  // namespace
+
+void test_function_traits()
+{
+    using namespace traits;
+
+    // 1. Тест обычной сигнатуры функции
+    using T1 = function_traits<void(int, float)>;
+    static_assert(is_same_v<typename T1::return_type, void>);
+    static_assert(T1::arity == 2);
+
+    // 2. Тест указателя на свободную функцию
+    using T2 = function_traits<decltype(&free_function)>;
+    static_assert(is_same_v<typename T2::return_type, int>);
+    static_assert(T2::arity == 1);
+
+    // 3. Тест обычного метода класса
+    using T3 = function_traits<decltype(&MyClassFunc::method)>;
+    static_assert(is_same_v<typename T3::return_type, void>);
+    static_assert(is_same_v<typename T3::class_type, MyClassFunc>);
+    static_assert(T3::arity == 1);
+
+    // 4. Тест константного метода класса
+    using T4 = function_traits<decltype(&MyClassFunc::const_method)>;
+    static_assert(is_same_v<typename T4::return_type, int>);
+    static_assert(is_same_v<typename T4::class_type, MyClassFunc>);
+    static_assert(T4::arity == 2);
+
+    // 5. Тест лямбды (через ее operator())
+    // Лямбда сама по себе не подходит под шаблоны выше,
+    // но можно проверить её метод вызова:
+    using T5 = function_traits<decltype(&decltype(lambda)::operator())>;
+    static_assert(is_same_v<typename T5::return_type, double>);
+    static_assert(T5::arity == 1);
+
+    // 6. Сложные типы
+    using T6 = function_traits<std::string*(const char**, int)>;
+    static_assert(is_same_v<typename T6::return_type, std::string*>);
+    static_assert(T6::arity == 2);
+}
 
 int main()
 {

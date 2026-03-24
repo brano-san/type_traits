@@ -3,8 +3,6 @@
 #include <type_traits>
 
 /* TODO List:
- - is_base_of
-
  - function_traits:   function_traits<F>::return_type  +  function_traits<F>::argument<0>::type
    - F(Args...)
    - F(*)(Args...)
@@ -25,6 +23,40 @@
 */
 
 namespace traits {
+
+template <typename F, typename... Args>
+struct function_traits
+{};
+
+template <typename F, typename... Args>
+struct function_traits<F(Args...)>
+{
+    using return_type                  = F;
+    static constexpr std::size_t arity = sizeof...(Args);
+};
+
+template <typename F, typename... Args>
+struct function_traits<F (*)(Args...)>
+{
+    using return_type                  = F;
+    static constexpr std::size_t arity = sizeof...(Args);
+};
+
+template <typename F, typename T, typename... Args>
+struct function_traits<F (T::*)(Args...)>
+{
+    using return_type                  = F;
+    using class_type                   = T;
+    static constexpr std::size_t arity = sizeof...(Args);
+};
+
+template <typename F, typename T, typename... Args>
+struct function_traits<F (T::*)(Args...) const>
+{
+    using return_type                  = F;
+    using class_type                   = T;
+    static constexpr std::size_t arity = sizeof...(Args);
+};
 
 template <typename... Args>
 using void_t = void;
