@@ -24,40 +24,6 @@
 
 namespace traits {
 
-template <typename F, typename... Args>
-struct function_traits
-{};
-
-template <typename F, typename... Args>
-struct function_traits<F(Args...)>
-{
-    using return_type                  = F;
-    static constexpr std::size_t arity = sizeof...(Args);
-};
-
-template <typename F, typename... Args>
-struct function_traits<F (*)(Args...)>
-{
-    using return_type                  = F;
-    static constexpr std::size_t arity = sizeof...(Args);
-};
-
-template <typename F, typename T, typename... Args>
-struct function_traits<F (T::*)(Args...)>
-{
-    using return_type                  = F;
-    using class_type                   = T;
-    static constexpr std::size_t arity = sizeof...(Args);
-};
-
-template <typename F, typename T, typename... Args>
-struct function_traits<F (T::*)(Args...) const>
-{
-    using return_type                  = F;
-    using class_type                   = T;
-    static constexpr std::size_t arity = sizeof...(Args);
-};
-
 template <typename... Args>
 using void_t = void;
 
@@ -498,6 +464,53 @@ struct is_base_of: bool_constant<(std::is_class_v<Base> && std::is_class_v<Deriv
 
 template <typename Base, typename Derived>
 inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
+
+template <size_t N, typename... Args>
+struct argument
+{};
+
+template <typename Head, typename... Tail>
+struct argument<0, Head, Tail...>
+{
+    using type = Head;
+};
+
+template <size_t N, typename Head, typename... Tail>
+struct argument<N, Head, Tail...>: argument<N - 1, Tail...>
+{};
+
+template <size_t N, typename... Args>
+using argument_t = typename argument<N, Args...>::type;
+
+template <typename R, typename... Args>
+struct function_traits
+{};
+
+template <typename R, typename... Args>
+struct function_traits<R(Args...)>
+{
+    using return_type                  = R;
+    static constexpr std::size_t arity = sizeof...(Args);
+
+    template <size_t N>
+    using arg_t = argument_t<N, Args...>;
+};
+
+template <typename R, typename... Args>
+struct function_traits<R (*)(Args...)>: function_traits<R(Args...)>
+{};
+
+template <typename R, typename T, typename... Args>
+struct function_traits<R (T::*)(Args...)>: function_traits<R(Args...)>
+{
+    using class_type = T;
+};
+
+template <typename R, typename T, typename... Args>
+struct function_traits<R (T::*)(Args...) const>: function_traits<R(Args...)>
+{
+    using class_type = T;
+};
 
 namespace imagine {
 template <typename T, typename = void>

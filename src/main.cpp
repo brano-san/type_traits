@@ -322,6 +322,17 @@ auto lambda = [](int a) -> double { return a * 1.5; };
 
 }  // namespace
 
+int complex_func(double a, std::string b, char c)
+{
+    return 0;
+}
+
+// Тестовый класс
+struct Processor
+{
+    void process(int x, float y) const {}
+};
+
 void test_function_traits()
 {
     using namespace traits;
@@ -359,6 +370,22 @@ void test_function_traits()
     using T6 = function_traits<std::string*(const char**, int)>;
     static_assert(is_same_v<typename T6::return_type, std::string*>);
     static_assert(T6::arity == 2);
+
+    static_assert(is_same_v<argument_t<2, int, double, float, char>, float>);
+
+    using F1 = function_traits<decltype(complex_func)>;
+    static_assert(std::is_same_v<F1::return_type, int>, "Return type mismatch");
+    static_assert(F1::arity == 3, "Arity mismatch");
+
+    static_assert(std::is_same_v<F1::arg_t<0>, double>, "Arg 0 mismatch");
+    static_assert(std::is_same_v<F1::arg_t<1>, std::string>, "Arg 1 mismatch");
+    static_assert(std::is_same_v<F1::arg_t<2>, char>, "Arg 2 mismatch");
+
+    // Тест для метода класса
+    using F2 = function_traits<decltype(&Processor::process)>;
+    static_assert(std::is_same_v<F2::class_type, Processor>, "Class type mismatch");
+    static_assert(std::is_same_v<F2::arg_t<0>, int>, "Method Arg 0 mismatch");
+    static_assert(std::is_same_v<F2::arg_t<1>, float>, "Method Arg 1 mismatch");
 }
 
 int main()
