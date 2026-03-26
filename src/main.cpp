@@ -324,6 +324,16 @@ auto lambda = [](int a) -> double { return a * 1.5; };
 }  // namespace
 
 namespace {
+struct ExplicitInt
+{
+    explicit ExplicitInt(int) {}
+};
+
+void target_derived(Derived*) {}
+
+void target_explicit(ExplicitInt) {}
+
+void target_rvalue(int&&) {}
 
 void free_func_noexcept(int, float) noexcept {}
 
@@ -433,6 +443,23 @@ void test_function_traits()
     static_assert(is_same_v<ComplexSig::return_type, std::string*>);
     static_assert(ComplexSig::arity == 2);
     static_assert(is_same_v<ComplexSig::arg_t<0>, const char**>);
+
+    //////////////////////////////////
+
+    static_assert(is_invokable_v<decltype(target_derived), Base*> == false, "Error 1");
+    static_assert(
+        is_invokable_v<decltype(target_derived), decltype(static_cast<Derived*>(std::declval<Base*>()))> == true, "Error 2");
+
+    // 2. Explicit конструктор: int -> ExplicitInt
+    // Неявно — нельзя, через static_cast — можно.
+    static_assert(is_invokable_v<decltype(target_explicit), int> == false, "Error 3");
+    static_assert(
+        is_invokable_v<decltype(target_explicit), decltype(static_cast<ExplicitInt>(std::declval<int>()))> == true, "Error 4");
+
+    // 3. Ссылки: Lvalue -> Rvalue (имитация std::move)
+    // Неявно — нельзя передать x в int&&, через static_cast — можно.
+    static_assert(is_invokable_v<decltype(target_rvalue), int&> == false, "Error 5");
+    static_assert(is_invokable_v<decltype(target_rvalue), decltype(static_cast<int&&>(std::declval<int&>()))> == true, "Error 6");
 }
 
 int main()

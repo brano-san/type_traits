@@ -1,19 +1,10 @@
 #pragma once
 
 #include <tuple>
+#include <functional>
 #include <type_traits>
 
 /* TODO List:
- - function_traits:   function_traits<F>::return_type  +  function_traits<F>::argument<0>::type
-   - F(Args...)
-   - F(*)(Args...)
-   - F(T::*)(Args...)
-   - F(T::*)(Args...) const
-
- - is_invokable: (By args)
-   - is_invocable_v<void(int, double), int, float> - true
-   - is_invocable_v<void(int), std::string>        - false
-
  - is_detected
 
  - Анализ типов с переменным количеством шаблонных параметров (допустим std::tuple):
@@ -554,6 +545,17 @@ struct function_traits<R (T::*)(Args...) const noexcept>: function_traits_info<R
     static constexpr bool is_const    = true;
     static constexpr bool is_noexcept = true;
 };
+
+template <typename AlwaysVoid, typename F, typename... Args>
+struct is_invokable: false_type
+{};
+
+template <typename F, typename... Args>
+struct is_invokable<std::void_t<decltype(std::invoke(declval<F>(), declval<Args>()...))>, F, Args...>: true_type
+{};
+
+template <typename F, typename... Args>
+inline constexpr bool is_invokable_v = is_invokable<void, F, Args...>::value;
 
 namespace imagine {
 template <typename T, typename = void>
