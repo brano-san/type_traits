@@ -357,6 +357,9 @@ auto my_lambda = [](int a) -> double { return a * 1.5; };
 // Сами тесты
 // ============================================================================
 
+template <typename T>
+using size_archetype = decltype(std::declval<T>().size());
+
 void test_function_traits()
 {
     // ==========================================
@@ -460,6 +463,10 @@ void test_function_traits()
     // Неявно — нельзя передать x в int&&, через static_cast — можно.
     static_assert(is_invokable_v<decltype(target_rvalue), int&> == false, "Error 5");
     static_assert(is_invokable_v<decltype(target_rvalue), decltype(static_cast<int&&>(std::declval<int&>()))> == true, "Error 6");
+
+    static_assert(is_detected_v<size_archetype, std::vector<int>>, "Vector has size()");
+    static_assert(is_detected_v<size_archetype, std::string>, "String has size()");
+    static_assert(!is_detected_v<size_archetype, int>, "Int has no size()");
 }
 
 int main()

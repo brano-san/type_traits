@@ -5,8 +5,6 @@
 #include <type_traits>
 
 /* TODO List:
- - is_detected
-
  - Анализ типов с переменным количеством шаблонных параметров (допустим std::tuple):
    - lenght<T> - возвращает количество шаблонных параметров
    - type_at<N, T> - возвращает N-ый тип из списка шаблонных параметров
@@ -556,6 +554,31 @@ struct is_invokable<std::void_t<decltype(std::invoke(declval<F>(), declval<Args>
 
 template <typename F, typename... Args>
 inline constexpr bool is_invokable_v = is_invokable<void, F, Args...>::value;
+
+struct nonesuch
+{
+    ~nonesuch() = delete;
+};
+
+template <class Default, class AlwaysVoid, template <typename...> class F, class... Args>
+struct detector
+{
+    using value_t = false_type;
+    using type    = Default;
+};
+
+template <class Default, template <typename...> class F, class... Args>
+struct detector<Default, std::void_t<F<Args...>>, F, Args...>: true_type
+{
+    using value_t = true_type;
+    using type    = F<Args...>;
+};
+
+template <template <typename...> class F, class... Args>
+using is_detected = typename detector<nonesuch, void, F, Args...>::value_t;
+
+template <template <typename...> class Op, typename... Args>
+inline constexpr bool is_detected_v = is_detected<Op, Args...>::value;
 
 namespace imagine {
 template <typename T, typename = void>
