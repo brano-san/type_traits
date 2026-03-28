@@ -4,14 +4,6 @@
 #include <functional>
 #include <type_traits>
 
-/* TODO List:
- - Анализ типов с переменным количеством шаблонных параметров (допустим std::tuple):
-   - lenght<T> - возвращает количество шаблонных параметров
-   - type_at<N, T> - возвращает N-ый тип из списка шаблонных параметров
-   - contains<U, T> - содержит ли T в списке шаблонных параметров U
-   - push_back<T, U> - добавляет тип в конец списка шаблонных параметров
-*/
-
 namespace traits {
 
 template <typename... Args>
@@ -455,6 +447,24 @@ struct is_base_of: bool_constant<(std::is_class_v<Base> && std::is_class_v<Deriv
 template <typename Base, typename Derived>
 inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
 
+template <typename... Args>
+struct args_count_helper;
+
+template <>
+struct args_count_helper<>
+{
+    static constexpr std::size_t value = 0;
+};
+
+template <typename Head, typename... Tail>
+struct args_count_helper<Head, Tail...>
+{
+    static constexpr std::size_t value = 1 + args_count_helper<Tail...>::value;
+};
+
+template <typename... Args>
+inline constexpr std::size_t args_count_v = args_count_helper<Args...>::value;
+
 template <std::size_t N, typename... Args>
 struct argument
 {};
@@ -579,6 +589,16 @@ using is_detected = typename detector<nonesuch, void, F, Args...>::value_t;
 
 template <template <typename...> class Op, typename... Args>
 inline constexpr bool is_detected_v = is_detected<Op, Args...>::value;
+
+// - Анализ типов с переменным количеством шаблонных параметров (допустим std::tuple):
+//     - lenght<T> - возвращает количество шаблонных параметров
+//     - type_at<N, T> - возвращает N-ый тип из списка шаблонных параметров
+//     - contains<U, T> - содержит ли T в списке шаблонных параметров U
+//     - push_back<T, U> - добавляет тип в конец списка шаблонных параметров
+
+template <template <typename... Args> class T>
+struct tuple_analysis
+{};
 
 namespace imagine {
 template <typename T, typename = void>

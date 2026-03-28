@@ -467,6 +467,12 @@ void test_function_traits()
     static_assert(is_detected_v<size_archetype, std::vector<int>>, "Vector has size()");
     static_assert(is_detected_v<size_archetype, std::string>, "String has size()");
     static_assert(!is_detected_v<size_archetype, int>, "Int has no size()");
+
+    static_assert(args_count_v<> == 0, "Error: count of empty args should be 0");
+    static_assert(args_count_v<int> == 1, "Error: count of <int> should be 1");
+    static_assert(args_count_v<int, char, double, float> == 4, "Error: count of 4 types should be 4");
+    static_assert(args_count_v<int, int, int> == 3, "Error: count of <int, int, int> should be 3");
+    static_assert(args_count_v<int&, const double*, void (*)(), int[10]> == 4, "Error: complex types failed");
 }
 
 int main()
