@@ -591,7 +591,6 @@ template <template <typename...> class Op, typename... Args>
 inline constexpr bool is_detected_v = is_detected<Op, Args...>::value;
 
 // - Анализ типов с переменным количеством шаблонных параметров (допустим std::tuple):
-//     - lenght<T> - возвращает количество шаблонных параметров
 //     - type_at<N, T> - возвращает N-ый тип из списка шаблонных параметров
 //     - contains<U, T> - содержит ли T в списке шаблонных параметров U
 //     - push_back<T, U> - добавляет тип в конец списка шаблонных параметров
