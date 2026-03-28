@@ -465,6 +465,9 @@ struct args_count_helper<Head, Tail...>
 template <typename... Args>
 inline constexpr std::size_t args_count_v = args_count_helper<Args...>::value;
 
+template <typename T, typename... Args>
+inline constexpr bool contains_v = (is_same_v<T, Args> || ...);
+
 template <std::size_t N, typename... Args>
 struct argument
 {};
@@ -605,6 +608,9 @@ struct tuple_analysis<T<Args...>>
 
     template <std::size_t N>
     using type_at = argument_t<N, Args...>;
+
+    template <typename U>
+    static constexpr bool contains = contains_v<U, Args...>;
 };
 
 namespace imagine {

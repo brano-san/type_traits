@@ -480,6 +480,16 @@ void test_function_traits()
     static_assert(is_same_v<tuple_analysis<my_type>::type_at<2>, double>);
     static_assert(is_same_v<tuple_analysis<my_type>::type_at<1>, char>);
     static_assert(is_same_v<tuple_analysis<my_type>::type_at<0>, int>);
+
+    static_assert(contains_v<int, char, int, float> == true);
+    static_assert(contains_v<double, char, int> == false);
+    static_assert(contains_v<int> == false);
+
+    static_assert(tuple_analysis<my_type>::contains<double>);
+    static_assert(tuple_analysis<my_type>::contains<char>);
+    static_assert(tuple_analysis<my_type>::contains<int>);
+    static_assert(!tuple_analysis<my_type>::contains<float>);
+    static_assert(!tuple_analysis<my_type>::contains<long>);
 }
 
 int main()
