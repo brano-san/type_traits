@@ -602,6 +602,9 @@ template <template <typename... Args> class T, typename... Args>
 struct tuple_analysis<T<Args...>>
 {
     static constexpr std::size_t length = args_count_v<Args...>;
+
+    template <std::size_t N>
+    using type_at = argument_t<N, Args...>;
 };
 
 namespace imagine {

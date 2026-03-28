@@ -476,6 +476,10 @@ void test_function_traits()
 
     using my_type = std::tuple<int, char, double>;
     static_assert(tuple_analysis<my_type>::length == 3, "Should be 3");
+
+    static_assert(is_same_v<tuple_analysis<my_type>::type_at<2>, double>);
+    static_assert(is_same_v<tuple_analysis<my_type>::type_at<1>, char>);
+    static_assert(is_same_v<tuple_analysis<my_type>::type_at<0>, int>);
 }
 
 int main()
