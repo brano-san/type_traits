@@ -596,9 +596,14 @@ inline constexpr bool is_detected_v = is_detected<Op, Args...>::value;
 //     - contains<U, T> - содержит ли T в списке шаблонных параметров U
 //     - push_back<T, U> - добавляет тип в конец списка шаблонных параметров
 
-template <template <typename... Args> class T>
-struct tuple_analysis
-{};
+template <typename T>
+struct tuple_analysis;
+
+template <template <typename... Args> class T, typename... Args>
+struct tuple_analysis<T<Args...>>
+{
+    static constexpr std::size_t length = args_count_v<Args...>;
+};
 
 namespace imagine {
 template <typename T, typename = void>

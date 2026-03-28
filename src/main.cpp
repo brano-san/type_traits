@@ -473,6 +473,9 @@ void test_function_traits()
     static_assert(args_count_v<int, char, double, float> == 4, "Error: count of 4 types should be 4");
     static_assert(args_count_v<int, int, int> == 3, "Error: count of <int, int, int> should be 3");
     static_assert(args_count_v<int&, const double*, void (*)(), int[10]> == 4, "Error: complex types failed");
+
+    using my_type = std::tuple<int, char, double>;
+    static_assert(tuple_analysis<my_type>::length == 3, "Should be 3");
 }
 
 int main()
