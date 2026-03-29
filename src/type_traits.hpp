@@ -609,6 +609,15 @@ struct tuple_analysis<T<Args...>>
 
     template <typename U>
     static constexpr bool contains = contains_v<U, Args...>;
+
+    template <typename U>
+    using push_back = T<Args..., U>;
+
+    template <typename... Us>
+    using append = T<Args..., Us...>;
+
+    template <typename U>
+    using push_front = T<U, Args...>;
 };
 
 namespace imagine {
