@@ -448,22 +448,7 @@ template <typename Base, typename Derived>
 inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
 
 template <typename... Args>
-struct args_count_helper;
-
-template <>
-struct args_count_helper<>
-{
-    static constexpr std::size_t value = 0;
-};
-
-template <typename Head, typename... Tail>
-struct args_count_helper<Head, Tail...>
-{
-    static constexpr std::size_t value = 1 + args_count_helper<Tail...>::value;
-};
-
-template <typename... Args>
-inline constexpr std::size_t args_count_v = args_count_helper<Args...>::value;
+inline constexpr std::size_t args_count_v = sizeof...(Args);
 
 template <typename T, typename... Args>
 inline constexpr bool contains_v = (is_same_v<T, Args> || ...);
