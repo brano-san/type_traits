@@ -340,7 +340,7 @@ struct is_addible: false_type
 {};
 
 template <typename T, typename U>
-struct is_addible<T, U, std::void_t<decltype(declval<T>() + declval<U>())>>: true_type
+struct is_addible<T, U, void_t<decltype(declval<T>() + declval<U>())>>: true_type
 {};
 
 template <typename T, typename U = T>
@@ -547,7 +547,7 @@ struct is_invokable: false_type
 {};
 
 template <typename F, typename... Args>
-struct is_invokable<std::void_t<decltype(std::invoke(declval<F>(), declval<Args>()...))>, F, Args...>: true_type
+struct is_invokable<void_t<decltype(std::invoke(declval<F>(), declval<Args>()...))>, F, Args...>: true_type
 {};
 
 template <typename F, typename... Args>
@@ -566,7 +566,7 @@ struct detector
 };
 
 template <class Default, template <typename...> class F, class... Args>
-struct detector<Default, std::void_t<F<Args...>>, F, Args...>: true_type
+struct detector<Default, void_t<F<Args...>>, F, Args...>: true_type
 {
     using value_t = true_type;
     using type    = F<Args...>;
